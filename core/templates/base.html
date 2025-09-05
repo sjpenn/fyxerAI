@@ -49,7 +49,8 @@
 <body class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans antialiased" 
       x-data="{ sidebarOpen: false }" 
       x-init="$store.theme.init()">
-    
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="{% load static %}{% static 'js/htmx-sb-auth.js' %}"></script>
     <!-- CSRF Token for Alpine.js AJAX requests -->
     {% csrf_token %}
     

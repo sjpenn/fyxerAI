@@ -48,6 +48,22 @@ class SupabaseAuthentication(BaseAuthentication):
     Expects Authorization: Bearer <JWT> header. On success, ties/creates a Django user by email.
     """
 
+    @staticmethod
+    def decode_token(token: str) -> dict:
+        unverified_headers = jwt.get_unverified_header(token)
+        public_key = _get_public_key(unverified_headers)
+        if not public_key:
+            raise exceptions.AuthenticationFailed('Invalid token: unknown key id')
+        audience = getattr(settings, 'SUPABASE_JWT_AUD', None) or 'authenticated'
+        payload = jwt.decode(
+            token,
+            public_key,
+            algorithms=['RS256'],
+            audience=audience,
+            options={'verify_exp': True}
+        )
+        return payload
+
     def authenticate(self, request) -> Optional[Tuple[object, None]]:
         auth = request.headers.get('Authorization') or ''
         if not auth.startswith('Bearer '):
@@ -57,19 +73,7 @@ class SupabaseAuthentication(BaseAuthentication):
             return None
 
         try:
-            unverified_headers = jwt.get_unverified_header(token)
-            public_key = _get_public_key(unverified_headers)
-            if not public_key:
-                raise exceptions.AuthenticationFailed('Invalid token: unknown key id')
-
-            audience = getattr(settings, 'SUPABASE_JWT_AUD', None) or 'authenticated'
-            payload = jwt.decode(
-                token,
-                public_key,
-                algorithms=['RS256'],
-                audience=audience,
-                options={'verify_exp': True}
-            )
+            payload = self.decode_token(token)
 
             email = payload.get('email') or payload.get('user_metadata', {}).get('email')
             sub = payload.get('sub')
@@ -95,4 +99,3 @@ class SupabaseAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed('Token expired')
         except jwt.InvalidTokenError as e:
             raise exceptions.AuthenticationFailed(f'Invalid token: {e}')
-

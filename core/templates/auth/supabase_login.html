@@ -17,6 +17,7 @@
       <input id="email" type="email" class="w-full rounded border px-3 py-2" placeholder="you@example.com" />
     </div>
     <button id="magic" class="btn-primary w-full">Send Magic Link</button>
+    <button id="google" class="btn-outline w-full">Continue with Google</button>
     <div class="text-xs text-slate-500">Check your inbox for the sign-in link.</div>
   </div>
 
@@ -32,14 +33,26 @@
       else alert('Magic link sent');
     });
 
+    document.getElementById('google').addEventListener('click', async () => {
+      const redirectTo = window.location.origin + '/supabase-login/';
+      const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+      if (error) alert(error.message);
+    });
+
     // If redirected back with access_token in URL hash, store and redirect
     (async () => {
       const hash = new URLSearchParams(window.location.hash.slice(1));
       const access_token = hash.get('access_token');
+      const refresh_token = hash.get('refresh_token');
       if (access_token) {
-        // Store in localStorage; add to default fetch headers for your frontend
         localStorage.setItem('sb:token', access_token);
-        // Example: redirect to home
+        // Set cookie for backend auth (expires in ~1 hour if not provided)
+        const expires_in = parseInt(hash.get('expires_in') || '3600');
+        const expDate = new Date(Date.now() + expires_in * 1000);
+        document.cookie = 'sb-access-token=' + encodeURIComponent(access_token) + '; Path=/; SameSite=Lax; Expires=' + expDate.toUTCString();
+        if (refresh_token) {
+          localStorage.setItem('sb:refresh_token', refresh_token);
+        }
         window.location.assign('/');
       }
     })();

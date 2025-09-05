@@ -76,6 +76,49 @@ class FakeService:
 
 
 @pytest.mark.django_db
+def test_fetch_history_since_collects_new_messages(monkeypatch):
+    # Prepare a history response with messagesAdded
+    history_resp = {
+        'history': [
+            {'id': '101', 'messagesAdded': [{'message': {'id': 'A'}}, {'message': {'id': 'B'}}]},
+            {'id': '102', 'messagesAdded': [{'message': {'id': 'C'}}]},
+        ],
+        'historyId': '102'
+    }
+
+    class FakeHistoryAPI:
+        def list(self, userId, startHistoryId, historyTypes, labelId, pageToken=None, fields=None):
+            return FakeRequest(history_resp)
+
+    class FakeUsersAPI2(FakeUsersAPI):
+        def __init__(self, pages, messages_data, send_capture):
+            super().__init__(pages, messages_data, send_capture)
+            self._history = FakeHistoryAPI()
+        def history(self):
+            return self._history
+
+    class FakeService2(FakeService):
+        def __init__(self, pages, messages_data, send_capture):
+            self._users = FakeUsersAPI2(pages, messages_data, send_capture)
+
+    send_capture = {}
+    pages = {'': {}}
+    msg_payload = {
+        'payload': {'headers': [{'name': 'Subject', 'value': 'Hello'}, {'name': 'From', 'value': 'a@b.com'}, {'name': 'To', 'value': 'x@y.com'}, {'name': 'Date', 'value': datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S +0000')}]},
+        'labelIds': ['INBOX'], 'threadId': 'T1', 'snippet': 'snip'}
+    messages_data = {'A': msg_payload, 'B': msg_payload, 'C': msg_payload}
+
+    monkeypatch.setattr(GmailService, '_initialize_service', lambda self: None)
+    svc = GmailService('test@example.com')
+    svc.credentials = object()
+    svc.service = FakeService2(pages, messages_data, send_capture)
+
+    emails, latest = svc.fetch_history_since('100', max_results=10)
+    assert len(emails) == 3
+    assert latest == '102'
+
+
+@pytest.mark.django_db
 def test_fetch_emails_paginates_and_limits(monkeypatch):
     send_capture = {}
     pages = {
@@ -113,4 +156,3 @@ def test_send_message_includes_thread_id_for_reply(monkeypatch):
     sent = svc.send_message('to@ex.com', 'Re: Subj', 'Body', reply_to_id='ORIG')
     assert sent['thread_id'] == 'THREAD123'
     assert send_capture['last_body'].get('threadId') == 'THREAD123'
-

@@ -1,0 +1,29 @@
+<!-- Gmail Live Inbox (metadata-first) -->
+<div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+  <div class="border-b border-slate-200 dark:border-slate-700 p-4 flex items-center justify-between">
+    <h2 class="text-sm font-semibold">Gmail Live Inbox</h2>
+    <div class="text-xs text-slate-500">{{ account_email }}</div>
+  </div>
+  <div class="divide-y divide-slate-200 dark:divide-slate-700">
+    {% if messages %}
+      {% for m in messages %}
+        <div class="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+             hx-get="/partials/gmail-message/{{ m.id }}/?email={{ account_email|urlencode }}"
+             hx-target="#email-detail-modal"
+             hx-swap="innerHTML">
+          <div class="flex items-start justify-between">
+            <div class="min-w-0 flex-1">
+              <div class="text-sm font-medium truncate">{{ m.subject|default:'(no subject)' }}</div>
+              <div class="text-xs text-slate-500 truncate">{{ m.sender }}</div>
+              <div class="text-xs text-slate-500 line-clamp-1 mt-1">{{ m.snippet }}</div>
+            </div>
+            <div class="ml-3 text-[11px] text-slate-400">{{ m.date|date:"Y-m-d H:i" }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="p-6 text-center text-sm text-slate-500">No messages</div>
+    {% endif %}
+  </div>
+</div>
+<div id="email-detail-modal"></div>

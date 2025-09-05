@@ -387,6 +387,55 @@ def gmail_message_list(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+# HTMX partials for Gmail metadata-first UI
+@login_required
+@require_http_methods(["GET"])
+def gmail_inbox_partial(request):
+    email = request.GET.get('email')
+    days = int(request.GET.get('days', 7))
+    limit = int(request.GET.get('limit', 50))
+    if not email:
+        return render(request, 'partials/unauthenticated.html', {'user': request.user})
+    try:
+        svc = get_gmail_service(email, scopes=['https://www.googleapis.com/auth/gmail.readonly'])
+        if not svc or not svc.is_authenticated():
+            from django.urls import reverse
+            return render(request, 'partials/email_list.html', {
+                'emails': [],
+                'error': 'Gmail not connected',
+                'connect_url': reverse('core:gmail_oauth_login')
+            })
+        from django.utils import timezone as _tz
+        from datetime import timedelta as _td
+        msgs = svc.fetch_emails(since_date=_tz.now() - _td(days=days), max_results=limit, include_bodies=False)
+        # Normalize fields to match template expectations
+        for m in msgs:
+            m['from_address'] = m.get('sender')
+            m['snippet'] = m.get('snippet', '')
+        return render(request, 'partials/gmail_gapi_list.html', {
+            'messages': msgs,
+            'account_email': email
+        })
+    except Exception as e:
+        return render(request, 'partials/email_list.html', {'emails': [], 'error': str(e)})
+
+
+@login_required
+@require_http_methods(["GET"])
+def gmail_message_detail_partial(request, message_id):
+    email = request.GET.get('email')
+    if not email:
+        return render(request, 'partials/unauthenticated.html', {'user': request.user})
+    try:
+        svc = get_gmail_service(email, scopes=['https://www.googleapis.com/auth/gmail.readonly'])
+        if not svc or not svc.is_authenticated():
+            return render(request, 'partials/email_detail.html', {'email': None, 'error': 'Gmail not connected'})
+        data = svc._process_message(message_id)
+        return render(request, 'partials/gmail_gapi_detail.html', {'message': data})
+    except Exception as e:
+        return render(request, 'partials/email_detail.html', {'email': None, 'error': str(e)})
+
+
 class EmailAccountListCreateView(generics.ListCreateAPIView):
     """List user's email accounts or create new one"""
 

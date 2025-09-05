@@ -54,6 +54,8 @@ htmx_urlpatterns = [
     path('email-stats/', views.email_stats_partial, name='email-stats-partial'),
     path('dashboard-overview/', views.dashboard_overview_partial, name='dashboard-overview-partial'),
     path('account-menu/', views.account_menu_partial, name='account-menu-partial'),
+    path('gmail-inbox/', views.gmail_inbox_partial, name='gmail-inbox-partial'),
+    path('gmail-message/<str:message_id>/', views.gmail_message_detail_partial, name='gmail-message-partial'),
 ]
 
 # Main URL patterns (template views + API + HTMX)

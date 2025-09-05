@@ -71,6 +71,14 @@
                          x-transition:leave-end="transform opacity-0 scale-95"
                          class="absolute right-0 mt-1 w-32 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 z-20">
                         <div class="py-1">
+                            {% if account.provider == 'gmail' %}
+                            <button 
+                                hx-get="/partials/gmail-inbox/?email={{ account.email_address|urlencode }}"
+                                hx-target="#main-content"
+                                class="block w-full text-left px-3 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700">
+                                Live Inbox
+                            </button>
+                            {% endif %}
                             <form method="post" action="{% url 'core:disconnect_account' account.id %}" class="block">
                                 {% csrf_token %}
                                 <button type="submit" 

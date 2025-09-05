@@ -49,6 +49,10 @@ flake8
 black
 isort
 
+# Supabase integration
+supabase
+PyJWT
+
 # Production
 gunicorn
 whitenoise

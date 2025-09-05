@@ -180,9 +180,14 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/emails/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
+# OAuth Development Settings - Allow HTTP for development
+if DEBUG:
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'core.auth.supabase_auth.SupabaseAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
@@ -233,6 +238,13 @@ GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID', default='')
 GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET', default='')
 MICROSOFT_CLIENT_ID = env('MICROSOFT_CLIENT_ID', default='')
 MICROSOFT_CLIENT_SECRET = env('MICROSOFT_CLIENT_SECRET', default='')
+
+# Supabase Configuration
+SUPABASE_URL = env('SUPABASE_URL', default='')
+SUPABASE_ANON_KEY = env('SUPABASE_ANON_KEY', default='')
+SUPABASE_SERVICE_ROLE_KEY = env('SUPABASE_SERVICE_ROLE_KEY', default='')
+SUPABASE_JWT_AUD = env('SUPABASE_JWT_AUD', default='authenticated')
+SUPABASE_JWKS_URL = env('SUPABASE_JWKS_URL', default='')
 
 # AI Configuration
 OPENAI_API_KEY = env('OPENAI_API_KEY', default='')

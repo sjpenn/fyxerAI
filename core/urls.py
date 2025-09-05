@@ -66,6 +66,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('components/', views.components_showcase, name='components'),
     path('login/', views.login_view, name='login'),
+    path('supabase-login/', views.supabase_login_view, name='supabase-login'),
     path('signup/', views.signup_view, name='signup'),
     
     # Account menu helper (for nested sidebar)

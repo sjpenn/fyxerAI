@@ -87,6 +87,14 @@ def signup_view(request):
     return render(request, 'auth/signup.html')
 
 
+def supabase_login_view(request):
+    from django.conf import settings
+    return render(request, 'auth/supabase_login.html', {
+        'SUPABASE_URL': getattr(settings, 'SUPABASE_URL', ''),
+        'SUPABASE_ANON_KEY': getattr(settings, 'SUPABASE_ANON_KEY', ''),
+    })
+
+
 # Template Views
 def home(request):
     """Dashboard home view with HTMX integration or API root."""

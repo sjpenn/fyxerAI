@@ -1,0 +1,152 @@
+{
+  "config": {
+    "configFile": "/Users/sjpenn/Sites/fyxerAI-GEDS/playwright.config.js",
+    "rootDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 15000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "id": "Microsoft Edge",
+        "name": "Microsoft Edge",
+        "testDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "id": "Google Chrome",
+        "name": "Google Chrome",
+        "testDir": "/Users/sjpenn/Sites/fyxerAI-GEDS/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "version": "1.41.0",
+    "workers": 5,
+    "webServer": null
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
+      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.\n"
+    }
+  ],
+  "stats": {
+    "startTime": "2025-09-05T19:22:44.707Z",
+    "duration": 7.102999999999952,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

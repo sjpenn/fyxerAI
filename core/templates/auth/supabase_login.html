@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Supabase Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="/static/css/output.css" />
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div class="max-w-md mx-auto mt-16 bg-white rounded-lg border p-6 space-y-4">
+    <h1 class="text-lg font-semibold">Sign in</h1>
+    <p class="text-sm text-slate-600">Use Supabase Authentication to sign in. After sign-in, this page will call back to the app and store your session token for API requests.</p>
+
+    <div class="space-y-2">
+      <label class="block text-sm">Email</label>
+      <input id="email" type="email" class="w-full rounded border px-3 py-2" placeholder="you@example.com" />
+    </div>
+    <button id="magic" class="btn-primary w-full">Send Magic Link</button>
+    <div class="text-xs text-slate-500">Check your inbox for the sign-in link.</div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "{{ SUPABASE_URL }}";
+    const SUPABASE_ANON_KEY = "{{ SUPABASE_ANON_KEY }}";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.getElementById('magic').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const { data, error } = await supabase.auth.signInWithOtp({ email });
+      if (error) alert(error.message);
+      else alert('Magic link sent');
+    });
+
+    // If redirected back with access_token in URL hash, store and redirect
+    (async () => {
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      const access_token = hash.get('access_token');
+      if (access_token) {
+        // Store in localStorage; add to default fetch headers for your frontend
+        localStorage.setItem('sb:token', access_token);
+        // Example: redirect to home
+        window.location.assign('/');
+      }
+    })();
+  </script>
+</body>
+</html>

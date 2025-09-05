@@ -68,16 +68,10 @@ class LabelManager:
             # TODO: Initialize Outlook service when implemented
             logger.warning("Outlook service not yet implemented")
     
-    def process_triage_results(self, emails: List[Dict], categorization_results: List[Dict]) -> Dict:
+    def process_triage_results(self, emails: List[Dict], categorization_results: List[Dict], use_batch: bool = True) -> Dict:
         """
         Process categorization results and apply appropriate labels and actions.
-        
-        Args:
-            emails: List of original email data
-            categorization_results: List of categorization results from AI/rule engine
-            
-        Returns:
-            Dictionary with processing results and statistics
+        Optionally batch Gmail label application to reduce API calls.
         """
         if len(emails) != len(categorization_results):
             logger.error("Email count mismatch with categorization results")
@@ -98,30 +92,51 @@ class LabelManager:
             }
         }
         
+        emails_by_category = {}
+        
         for email, categorization in zip(emails, categorization_results):
             try:
-                # Apply labels and actions for this email
-                email_result = self._process_single_email(email, categorization)
+                email_result = self._process_single_email(email, categorization) if not use_batch else {
+                    'email_id': email.get('id'),
+                    'category': categorization.get('category', 'routine'),
+                    'confidence': categorization.get('confidence', 0.5),
+                    'actions_applied': [],
+                    'success': True,
+                    'error': None
+                }
+                
+                # When batching, collect Gmail apply_label actions; apply others immediately
+                category = categorization.get('category', 'routine')
+                if use_batch and self.platform == 'gmail':
+                    actions_config = self.CATEGORY_ACTIONS.get(category, {})
+                    for action in actions_config.get('gmail_actions', []):
+                        if action == 'apply_label':
+                            emails_by_category.setdefault(category, []).append(email.get('id'))
+                            email_result['actions_applied'].append({'action': action, 'success': True, 'timestamp': timezone.now().isoformat()})
+                        else:
+                            action_result = self._apply_action(email.get('id'), action, category)
+                            email_result['actions_applied'].append({'action': action, 'success': action_result, 'timestamp': timezone.now().isoformat()})
                 
                 if email_result['success']:
                     results['processed_count'] += 1
                     results['label_applications'].append(email_result)
-                    
-                    # Update statistics
-                    category = categorization.get('category', 'routine')
                     results['statistics'][category] += 1
                 else:
-                    results['errors'].append({
-                        'email_id': email.get('id'),
-                        'error': email_result.get('error', 'Unknown error')
-                    })
+                    results['errors'].append({'email_id': email.get('id'), 'error': email_result.get('error', 'Unknown error')})
                 
             except Exception as e:
                 logger.error(f"Failed to process email {email.get('id')}: {e}")
-                results['errors'].append({
-                    'email_id': email.get('id'),
-                    'error': str(e)
-                })
+                results['errors'].append({'email_id': email.get('id'), 'error': str(e)})
+        
+        # Perform batch Gmail label application when requested
+        if use_batch and self.platform == 'gmail' and self.gmail_service and emails_by_category:
+            try:
+                label_ids = self.gmail_service.setup_fyxerai_labels()
+                for cat, ids in emails_by_category.items():
+                    if ids and cat in label_ids:
+                        self.gmail_service.batch_modify(ids, add_label_ids=[label_ids[cat]])
+            except Exception as e:
+                logger.warning(f"Batch label application failed: {e}")
         
         logger.info(f"Triage processing completed: {results['processed_count']}/{len(emails)} emails processed")
         return results

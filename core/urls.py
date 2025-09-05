@@ -26,6 +26,8 @@ api_urlpatterns = [
     path('emails/reply/', views.EmailDraftGenerateView.as_view(), name='email-draft'),
     # Gmail direct message detail (on-demand)
     path('gmail/message/<str:message_id>/', views.gmail_message_detail, name='gmail-message-detail'),
+    # Gmail list (metadata-first)
+    path('gmail/messages/', views.gmail_message_list, name='gmail-message-list'),
     
     # Cross-account categorization system
     path('categorization/stats/', views.CategoryStatsView.as_view(), name='category-stats'),

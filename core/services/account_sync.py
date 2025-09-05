@@ -15,6 +15,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 from ..models import EmailAccount, EmailMessage, UserPreference
+from .gmail_service import get_gmail_service
 from .categorization_engine import EmailCategorizationEngine, categorize_emails_batch
 from .notification_service import notification_service
 
@@ -147,14 +148,23 @@ class CrossAccountSyncManager:
             Dictionary with sync result for this account
         """
         try:
-            # Determine sync window
-            if force_full_sync or not account.last_sync:
-                sync_since = timezone.now() - timedelta(days=30)  # Last 30 days for full sync
+            # Determine sync strategy
+            use_history = bool(account.gmail_history_id) and not force_full_sync and account.provider == 'gmail'
+
+            if use_history:
+                service = get_gmail_service(
+                    account.email_address,
+                    scopes=['https://www.googleapis.com/auth/gmail.readonly']
+                )
+                emails, latest_history = service.fetch_history_since(account.gmail_history_id, max_results=200)
+                new_emails = emails
+                sync_since = None
             else:
-                sync_since = account.last_sync - timedelta(hours=1)  # 1 hour overlap
-            
-            # Mock email fetching (in production, this would use Gmail/Outlook APIs)
-            new_emails = self._fetch_emails_from_provider(account, sync_since)
+                if force_full_sync or not account.last_sync:
+                    sync_since = timezone.now() - timedelta(days=30)
+                else:
+                    sync_since = account.last_sync - timedelta(hours=1)
+                new_emails = self._fetch_emails_from_provider(account, sync_since)
             
             emails_processed = 0
             emails_categorized = 0
@@ -191,9 +201,11 @@ class CrossAccountSyncManager:
                     emails_processed += 1
                     emails_categorized += 1
                 
-                # Update account sync timestamp
+                # Update account sync timestamp and history id if available
                 account.last_sync = timezone.now()
-                account.save()
+                if use_history and latest_history:
+                    account.gmail_history_id = str(latest_history)
+                account.save(update_fields=['last_sync', 'gmail_history_id', 'updated_at'])
             
             return {
                 'success': True,

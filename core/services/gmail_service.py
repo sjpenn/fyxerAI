@@ -653,6 +653,47 @@ class GmailService:
             logger.error(f"Failed to get unread count: {e}")
             return 0
 
+    def fetch_history_since(self, start_history_id: str, max_results: int = 200) -> Tuple[List[Dict], Optional[str]]:
+        """Fetch message changes since a historyId (new messages in INBOX).
+
+        Returns (emails, latest_history_id).
+        """
+        if not self.is_authenticated() or not start_history_id:
+            return [], None
+        try:
+            emails: List[Dict] = []
+            page_token = None
+            seen = 0
+            latest_id = start_history_id
+            while True:
+                req = self.service.users().history().list(
+                    userId='me', startHistoryId=start_history_id,
+                    historyTypes=['messageAdded'], labelId='INBOX', pageToken=page_token,
+                    fields='history(id,messagesAdded(message(id,threadId))),nextPageToken,historyId'
+                )
+                resp = self._execute_with_retry(req)
+                if not resp:
+                    break
+                for h in resp.get('history', []) or []:
+                    latest_id = str(h.get('id', latest_id))
+                    for ma in h.get('messagesAdded', []) or []:
+                        mid = ma.get('message', {}).get('id')
+                        if not mid:
+                            continue
+                        data = self._process_message(mid)
+                        if data:
+                            emails.append(data)
+                            seen += 1
+                            if seen >= max_results:
+                                return emails, latest_id
+                page_token = resp.get('nextPageToken')
+                if not page_token:
+                    break
+            return emails, latest_id
+        except Exception as e:
+            logger.error(f"Failed to fetch history since {start_history_id}: {e}")
+            return [], None
+
     def create_draft(self, to: str, subject: str, body: str, reply_to_id: str = None) -> Optional[Dict]:
         """
         Create a draft email in Gmail.

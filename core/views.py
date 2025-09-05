@@ -366,6 +366,27 @@ def gmail_message_detail(request, message_id):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+@login_required
+@require_http_methods(["GET"])
+def gmail_message_list(request):
+    """Return Gmail messages (metadata-first). Params: email, days=7, limit=50"""
+    email = request.GET.get('email')
+    days = int(request.GET.get('days', 7))
+    limit = int(request.GET.get('limit', 50))
+    if not email:
+        return JsonResponse({'error': 'email parameter required'}, status=400)
+    try:
+        svc = get_gmail_service(email, scopes=['https://www.googleapis.com/auth/gmail.readonly'])
+        if not svc or not svc.is_authenticated():
+            return JsonResponse({'error': 'gmail not authenticated'}, status=401)
+        from django.utils import timezone as _tz
+        from datetime import timedelta as _td
+        msgs = svc.fetch_emails(since_date=_tz.now() - _td(days=days), max_results=limit, include_bodies=False)
+        return JsonResponse({'messages': msgs})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
 class EmailAccountListCreateView(generics.ListCreateAPIView):
     """List user's email accounts or create new one"""
 

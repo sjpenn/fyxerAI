@@ -1,0 +1,137 @@
+<!-- Account Menu Nested List -->
+{% if accounts %}
+    {% for account in accounts %}
+        <a href="#" 
+           @click="activeSection = 'account-{{ account.id }}'"
+           class="group flex items-center px-3 py-2 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+            <!-- Provider Icon -->
+            {% if account.provider == 'gmail' %}
+                <div class="mr-2 w-4 h-4 bg-red-100 dark:bg-red-900 rounded flex items-center justify-center">
+                    <svg class="w-2.5 h-2.5 text-red-600 dark:text-red-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                    </svg>
+                </div>
+            {% elif account.provider == 'outlook' %}
+                <div class="mr-2 w-4 h-4 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center">
+                    <svg class="w-2.5 h-2.5 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7.88 12.04q0 .45-.11.87-.1.41-.33.74-.22.33-.58.52-.37.2-.87.2t-.87-.2q-.36-.19-.58-.52-.22-.33-.33-.74-.1-.42-.1-.87t.1-.87q.11-.41.33-.74.22-.33.58-.52.36-.19.87-.19t.87.19q.37.19.58.52.22.33.33.74.11.42.11.87zM21.5 9v10.5q0 .75-.56 1.31-.55.56-1.31.56H4.37q-.75 0-1.31-.56Q2.5 20.25 2.5 19.5V9q0-.75.56-1.31Q3.62 7.13 4.37 7.13h15.26q.75 0 1.31.56.56.56.56 1.31z"/>
+                    </svg>
+                </div>
+            {% else %}
+                <div class="mr-2 w-4 h-4 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center">
+                    <svg class="w-2.5 h-2.5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+            {% endif %}
+
+            <!-- Account Details -->
+            <div class="flex-1 min-w-0">
+                <p class="font-medium truncate">
+                    {{ account.display_name|default:account.email_address|truncatechars:25 }}
+                </p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">
+                    {{ account.email_address|truncatechars:25 }}
+                </p>
+            </div>
+
+            <!-- Status Indicator and Actions -->
+            <div class="ml-2 flex items-center space-x-2">
+                {% if account.sync_enabled %}
+                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full" title="Sync enabled"></div>
+                {% else %}
+                    <div class="w-1.5 h-1.5 bg-red-500 rounded-full" title="Sync disabled"></div>
+                {% endif %}
+
+                {% if account.external_unread is not None and account.external_unread > 0 %}
+                    <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" title="Unread messages">
+                        {{ account.external_unread }}
+                    </span>
+                {% elif account.unread_count %}
+                    <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" title="Unread messages">
+                        {{ account.unread_count }}
+                    </span>
+                {% endif %}
+                
+                <!-- Account Actions Dropdown -->
+                <div x-data="AlpineComponents.dropdown()" class="relative">
+                    <button @click="toggle()" class="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" title="Account options">
+                        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                        </svg>
+                    </button>
+                    
+                    <div x-show="open" 
+                         @click.away="hide()"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute right-0 mt-1 w-32 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 z-20">
+                        <div class="py-1">
+                            <form method="post" action="{% url 'core:disconnect_account' account.id %}" class="block">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        onclick="return confirm('Are you sure you want to disconnect {{ account.email_address }}?')"
+                                        class="block w-full text-left px-3 py-2 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                    Disconnect
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+
+    <!-- Add Account Options -->
+    <div class="border-t border-slate-200 dark:border-slate-700 mt-2 pt-2 space-y-1">
+        <a href="{% url 'core:add_account_form' %}" 
+           class="group flex items-center w-full px-3 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+            <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add Account
+        </a>
+        
+        <!-- Quick Connect Options -->
+        <div class="pl-2 space-y-1">
+            <a href="{% url 'core:gmail_oauth_login' %}" 
+               class="group flex items-center w-full px-3 py-2 text-xs text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors">
+                <svg class="mr-2 w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                </svg>
+                Connect Gmail Now
+            </a>
+        </div>
+    </div>
+
+{% else %}
+    <!-- Empty state -->
+    <div class="px-3 py-2">
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 text-center">
+            No connected accounts
+        </p>
+        
+        <!-- Connect Options -->
+        <div class="space-y-1">
+            <a href="{% url 'core:add_account_form' %}" 
+               class="group flex items-center w-full px-3 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+                <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add Account
+            </a>
+            
+            <a href="{% url 'core:gmail_oauth_login' %}" 
+               class="group flex items-center w-full px-3 py-2 text-xs text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors">
+                <svg class="mr-2 w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                </svg>
+                Connect Gmail
+            </a>
+        </div>
+    </div>
+{% endif %}

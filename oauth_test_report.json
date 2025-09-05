@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-09-04T21:23:27.954077",
+  "tests": {
+    "django_config": true,
+    "oauth_config": false,
+    "user_model": true,
+    "email_account_model": true,
+    "database_queries": true,
+    "oauth_urls": true
+  },
+  "recommendations": [
+    "Configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env file"
+  ],
+  "success": true
+}

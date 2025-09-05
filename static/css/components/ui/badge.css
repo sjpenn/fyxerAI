@@ -1,0 +1,317 @@
+/* ShadCN UI Badge Component - Adapted for Alpine.js */
+
+.badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  @apply transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+}
+
+/* Badge Variants */
+.badge-primary {
+  @apply bg-primary-100 text-primary-800 hover:bg-primary-200;
+  @apply dark:bg-primary-900 dark:text-primary-300 dark:hover:bg-primary-800;
+}
+
+.badge-secondary {
+  @apply bg-secondary-100 text-secondary-800 hover:bg-secondary-200;
+  @apply dark:bg-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800 hover:bg-green-200;
+  @apply dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800 hover:bg-yellow-200;
+  @apply dark:bg-yellow-900 dark:text-yellow-300 dark:hover:bg-yellow-800;
+}
+
+.badge-error {
+  @apply bg-red-100 text-red-800 hover:bg-red-200;
+  @apply dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800;
+}
+
+.badge-info {
+  @apply bg-blue-100 text-blue-800 hover:bg-blue-200;
+  @apply dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800;
+}
+
+.badge-neutral {
+  @apply bg-slate-100 text-slate-800 hover:bg-slate-200;
+  @apply dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700;
+}
+
+.badge-outline {
+  @apply border border-current bg-transparent;
+}
+
+.badge-outline.badge-primary {
+  @apply text-primary-600 border-primary-600 hover:bg-primary-50;
+  @apply dark:text-primary-400 dark:border-primary-400 dark:hover:bg-primary-950;
+}
+
+.badge-outline.badge-secondary {
+  @apply text-secondary-600 border-secondary-600 hover:bg-secondary-50;
+  @apply dark:text-secondary-400 dark:border-secondary-400 dark:hover:bg-secondary-950;
+}
+
+.badge-outline.badge-success {
+  @apply text-green-600 border-green-600 hover:bg-green-50;
+  @apply dark:text-green-400 dark:border-green-400 dark:hover:bg-green-950;
+}
+
+.badge-outline.badge-warning {
+  @apply text-yellow-600 border-yellow-600 hover:bg-yellow-50;
+  @apply dark:text-yellow-400 dark:border-yellow-400 dark:hover:bg-yellow-950;
+}
+
+.badge-outline.badge-error {
+  @apply text-red-600 border-red-600 hover:bg-red-50;
+  @apply dark:text-red-400 dark:border-red-400 dark:hover:bg-red-950;
+}
+
+.badge-outline.badge-info {
+  @apply text-blue-600 border-blue-600 hover:bg-blue-50;
+  @apply dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-950;
+}
+
+.badge-outline.badge-neutral {
+  @apply text-slate-600 border-slate-600 hover:bg-slate-50;
+  @apply dark:text-slate-400 dark:border-slate-400 dark:hover:bg-slate-950;
+}
+
+/* Badge Sizes */
+.badge-xs {
+  @apply px-1.5 py-0.5 text-xs;
+}
+
+.badge-sm {
+  @apply px-2 py-0.5 text-xs;
+}
+
+.badge-md {
+  @apply px-2.5 py-0.5 text-xs;
+}
+
+.badge-lg {
+  @apply px-3 py-1 text-sm;
+}
+
+.badge-xl {
+  @apply px-4 py-1.5 text-sm;
+}
+
+/* Badge with Icon */
+.badge-with-icon {
+  @apply flex items-center space-x-1;
+}
+
+.badge-icon {
+  @apply w-3 h-3;
+}
+
+.badge-icon-left {
+  @apply -ml-0.5;
+}
+
+.badge-icon-right {
+  @apply -mr-0.5;
+}
+
+/* Badge with Dot */
+.badge-dot {
+  @apply relative;
+}
+
+.badge-dot::before {
+  @apply absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full;
+  content: '';
+}
+
+.badge-dot-success::before {
+  @apply bg-green-500;
+}
+
+.badge-dot-warning::before {
+  @apply bg-yellow-500;
+}
+
+.badge-dot-info::before {
+  @apply bg-blue-500;
+}
+
+/* Badge States */
+.badge-pulse {
+  @apply animate-pulse;
+}
+
+.badge-loading {
+  @apply relative overflow-hidden;
+}
+
+.badge-loading::after {
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent;
+  content: '';
+  animation: shimmer 2s infinite;
+}
+
+.badge-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Badge Interactive */
+.badge-clickable {
+  @apply cursor-pointer hover:shadow-sm transform hover:scale-105;
+  @apply transition-all duration-150 focus:ring-2 focus:ring-offset-2;
+}
+
+.badge-clickable:hover {
+  @apply shadow-md;
+}
+
+.badge-clickable:active {
+  @apply scale-95;
+}
+
+/* Badge with Close */
+.badge-closable {
+  @apply pr-1;
+}
+
+.badge-close {
+  @apply ml-1 -mr-0.5 w-3 h-3 hover:bg-black/10 rounded-full;
+  @apply flex items-center justify-center transition-colors;
+  @apply dark:hover:bg-white/10;
+}
+
+.badge-close:hover {
+  @apply bg-current/10;
+}
+
+/* Badge Pill */
+.badge-pill {
+  @apply rounded-full;
+}
+
+/* Badge Square */
+.badge-square {
+  @apply rounded-md;
+}
+
+/* Badge Group */
+.badge-group {
+  @apply flex flex-wrap gap-1;
+}
+
+.badge-group-vertical {
+  @apply flex flex-col space-y-1;
+}
+
+/* Badge with Number */
+.badge-number {
+  @apply min-w-[1.25rem] h-5 text-xs font-medium;
+  @apply flex items-center justify-center;
+}
+
+.badge-number-sm {
+  @apply min-w-[1rem] h-4 text-xs;
+}
+
+.badge-number-lg {
+  @apply min-w-[1.5rem] h-6 text-sm;
+}
+
+/* Status Badges */
+.badge-online {
+  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300;
+}
+
+.badge-offline {
+  @apply bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300;
+}
+
+.badge-away {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300;
+}
+
+.badge-busy {
+  @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300;
+}
+
+/* Priority Badges */
+.badge-priority-low {
+  @apply bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300;
+}
+
+.badge-priority-medium {
+  @apply bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300;
+}
+
+.badge-priority-high {
+  @apply bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300;
+}
+
+.badge-priority-urgent {
+  @apply bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300;
+}
+
+/* Badge Animations */
+.badge-bounce {
+  @apply animate-bounce;
+}
+
+.badge-fade-in {
+  @apply animate-fade-in;
+}
+
+.badge-slide-in {
+  @apply animate-slide-up;
+}
+
+/* Custom Animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Badge Responsive */
+@media (max-width: 640px) {
+  .badge-responsive {
+    @apply text-xs px-2 py-0.5;
+  }
+  
+  .badge-responsive.badge-lg {
+    @apply text-xs px-2.5 py-0.5;
+  }
+  
+  .badge-responsive.badge-xl {
+    @apply text-sm px-3 py-1;
+  }
+}
+
+/* Dark mode specific adjustments */
+@media (prefers-color-scheme: dark) {
+  .badge-auto-dark.badge-primary {
+    @apply bg-primary-900 text-primary-300;
+  }
+  
+  .badge-auto-dark.badge-secondary {
+    @apply bg-secondary-900 text-secondary-300;
+  }
+  
+  .badge-auto-dark.badge-success {
+    @apply bg-green-900 text-green-300;
+  }
+  
+  .badge-auto-dark.badge-warning {
+    @apply bg-yellow-900 text-yellow-300;
+  }
+  
+  .badge-auto-dark.badge-error {
+    @apply bg-red-900 text-red-300;
+  }
+}

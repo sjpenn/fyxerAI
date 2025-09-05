@@ -1,0 +1,279 @@
+<!-- Real-time Email Dashboard Component -->
+<div x-data="realtimeDashboard()" 
+     x-init="init()"
+     class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+     
+  <!-- Connection Status -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+        Email Dashboard
+      </h2>
+      <div class="flex space-x-2">
+        <!-- Sync Connection Status -->
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 rounded-full"
+               :class="$store.realtime.syncConnected ? 'bg-green-500' : 'bg-red-500'"></div>
+          <span class="text-xs text-gray-600 dark:text-gray-400">Sync</span>
+        </div>
+        <!-- Notifications Connection Status -->
+        <div class="flex items-center space-x-1">
+          <div class="w-2 h-2 rounded-full"
+               :class="$store.realtime.notificationsConnected ? 'bg-green-500' : 'bg-red-500'"></div>
+          <span class="text-xs text-gray-600 dark:text-gray-400">Notifications</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sync Status Panel -->
+  <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-medium text-gray-900 dark:text-white">Sync Status</h3>
+      <button @click="startSync(false)" 
+              :disabled="$store.realtime.syncStatus.is_syncing"
+              class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
+        <span x-show="!$store.realtime.syncStatus.is_syncing">Start Sync</span>
+        <span x-show="$store.realtime.syncStatus.is_syncing" class="flex items-center">
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Syncing...
+        </span>
+      </button>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div>
+        <span class="text-gray-600 dark:text-gray-400">Active Accounts:</span>
+        <span class="font-medium ml-1" x-text="$store.realtime.syncStatus.active_accounts"></span>
+      </div>
+      <div>
+        <span class="text-gray-600 dark:text-gray-400">Total Accounts:</span>
+        <span class="font-medium ml-1" x-text="$store.realtime.syncStatus.total_accounts"></span>
+      </div>
+      <div class="col-span-2" x-show="$store.realtime.syncStatus.last_sync">
+        <span class="text-gray-600 dark:text-gray-400">Last Sync:</span>
+        <span class="font-medium ml-1" x-text="formatDate($store.realtime.syncStatus.last_sync)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unread Email Counter -->
+  <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="font-medium text-gray-900 dark:text-white">Unread Emails</h3>
+        <p class="text-2xl font-bold text-blue-600 dark:text-blue-400" x-text="$store.realtime.unreadCount"></p>
+      </div>
+      <div class="text-4xl">📧</div>
+    </div>
+  </div>
+
+  <!-- Recent Emails Feed -->
+  <div class="mb-6">
+    <h3 class="font-medium text-gray-900 dark:text-white mb-3">Recent Emails</h3>
+    <div class="space-y-2 max-h-60 overflow-y-auto">
+      <template x-for="email in $store.realtime.recentEmails.slice(0, 5)" :key="email.id">
+        <div class="p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+             @click="markEmailRead(email.id)">
+          <div class="flex items-start justify-between">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                      :class="getCategoryBadgeClass(email.category)"
+                      x-text="email.category"></span>
+                <span x-show="email.is_urgent" class="text-red-500 text-xs">🚨 URGENT</span>
+              </div>
+              <p class="font-medium text-gray-900 dark:text-white truncate mt-1" x-text="email.subject"></p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 truncate" x-text="email.sender"></p>
+            </div>
+            <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap" 
+                  x-text="formatDate(email.received_at)"></span>
+          </div>
+        </div>
+      </template>
+      
+      <div x-show="$store.realtime.recentEmails.length === 0" 
+           class="text-center py-8 text-gray-500 dark:text-gray-400">
+        No recent emails
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-time Notifications Panel -->
+  <div class="mb-6">
+    <h3 class="font-medium text-gray-900 dark:text-white mb-3">Recent Notifications</h3>
+    <div class="space-y-2 max-h-40 overflow-y-auto">
+      <template x-for="notification in $store.realtime.recentNotifications.slice(0, 3)" :key="notification.id">
+        <div class="p-2 rounded border-l-4 text-sm"
+             :class="getNotificationClass(notification.type)">
+          <div class="flex items-center justify-between">
+            <span x-text="notification.message"></span>
+            <button @click="$store.realtime.removeNotification(notification.id)" 
+                    class="text-gray-400 hover:text-gray-600 text-xs">×</button>
+          </div>
+          <div class="text-xs opacity-75 mt-1" x-text="formatDate(notification.timestamp)"></div>
+        </div>
+      </template>
+      
+      <div x-show="$store.realtime.recentNotifications.length === 0" 
+           class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
+        No recent notifications
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="flex space-x-2">
+    <button @click="startSync(true)" 
+            :disabled="$store.realtime.syncStatus.is_syncing"
+            class="flex-1 px-3 py-2 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50">
+      Force Full Sync
+    </button>
+    <button @click="refreshUnreadCount()" 
+            class="flex-1 px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700">
+      Refresh Count
+    </button>
+  </div>
+</div>
+
+<!-- Urgent Email Alert Modal -->
+<div x-show="urgentAlert" 
+     x-transition
+     @urgent-email.window="showUrgentAlert($event.detail)"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+     style="display: none;">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md mx-4 shadow-xl">
+    <div class="flex items-center mb-4">
+      <div class="text-red-500 text-2xl mr-3">🚨</div>
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Urgent Email Alert</h3>
+    </div>
+    
+    <div x-show="urgentEmailData" class="mb-4">
+      <p class="font-medium text-gray-900 dark:text-white" x-text="urgentEmailData?.subject"></p>
+      <p class="text-gray-600 dark:text-gray-400 text-sm" x-text="'From: ' + urgentEmailData?.sender"></p>
+    </div>
+    
+    <div class="flex space-x-3">
+      <button @click="urgentAlert = false" 
+              class="flex-1 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+        Dismiss
+      </button>
+      <button @click="viewUrgentEmail()" 
+              class="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+        View Email
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function realtimeDashboard() {
+  return {
+    urgentAlert: false,
+    urgentEmailData: null,
+    
+    init() {
+      // Listen for WebSocket connection changes
+      window.addEventListener('websocketConnectionChange', this.handleConnectionChange.bind(this));
+      
+      // Request initial data
+      if (window.emailWebSocket) {
+        window.emailWebSocket.getSyncStatus();
+        window.emailWebSocket.getUnreadCount();
+      }
+    },
+    
+    handleConnectionChange(event) {
+      console.log('Connection change:', event.detail);
+    },
+    
+    startSync(forceFullSync = false) {
+      if (window.emailWebSocket) {
+        window.emailWebSocket.startSync(forceFullSync);
+      }
+    },
+    
+    refreshUnreadCount() {
+      if (window.emailWebSocket) {
+        window.emailWebSocket.getUnreadCount();
+      }
+    },
+    
+    markEmailRead(emailId) {
+      if (window.emailWebSocket) {
+        window.emailWebSocket.markEmailRead([emailId]);
+        
+        // Update local state
+        const store = Alpine.store('realtime');
+        if (store.unreadCount > 0) {
+          store.unreadCount--;
+        }
+      }
+    },
+    
+    showUrgentAlert(alertData) {
+      this.urgentEmailData = alertData;
+      this.urgentAlert = true;
+      
+      // Auto-dismiss after 10 seconds
+      setTimeout(() => {
+        this.urgentAlert = false;
+      }, 10000);
+    },
+    
+    viewUrgentEmail() {
+      if (this.urgentEmailData) {
+        // Navigate to email view (implement based on your routing)
+        window.location.href = `/emails/${this.urgentEmailData.id}/`;
+      }
+      this.urgentAlert = false;
+    },
+    
+    formatDate(dateString) {
+      if (!dateString) return '';
+      
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMins / 60);
+      const diffDays = Math.floor(diffHours / 24);
+      
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays < 7) return `${diffDays}d ago`;
+      
+      return date.toLocaleDateString();
+    },
+    
+    getCategoryBadgeClass(category) {
+      const classes = {
+        urgent: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+        important: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400',
+        routine: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+        promotional: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+        spam: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
+        pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+      };
+      
+      return classes[category] || classes.routine;
+    },
+    
+    getNotificationClass(type) {
+      const classes = {
+        success: 'bg-green-50 border-green-400 text-green-800 dark:bg-green-900/20 dark:border-green-600 dark:text-green-400',
+        error: 'bg-red-50 border-red-400 text-red-800 dark:bg-red-900/20 dark:border-red-600 dark:text-red-400',
+        warning: 'bg-yellow-50 border-yellow-400 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-600 dark:text-yellow-400',
+        info: 'bg-blue-50 border-blue-400 text-blue-800 dark:bg-blue-900/20 dark:border-blue-600 dark:text-blue-400',
+        urgent: 'bg-red-50 border-red-500 text-red-900 dark:bg-red-900/20 dark:border-red-500 dark:text-red-300'
+      };
+      
+      return classes[type] || classes.info;
+    }
+  }
+}
+</script>

@@ -1,0 +1,6 @@
+Usage: python -m celery [OPTIONS] COMMAND [ARGS]...
+Try 'python -m celery --help' for help.
+
+Error: 
+Unable to load celery application.
+Module 'fyxerai_assistant' has no attribute 'celery'

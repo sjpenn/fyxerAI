@@ -1,0 +1,481 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FYXERAI Dashboard - Email Management{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}AI-powered email management for Gmail and Outlook{% endblock %}
+
+{% block content %}
+<!-- HTMX-powered Dashboard -->
+<div class="max-w-7xl mx-auto" x-data="{ activeTab: 'overview' }">
+    
+    <!-- Quick Actions Bar -->
+    <div class="relative bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 rounded-xl shadow-xl p-8 mb-8 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-600/90 via-purple-600/90 to-blue-700/90"></div>
+        <div class="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-purple-300/10 rounded-full blur-3xl"></div>
+        
+        <div class="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="text-white">
+                <h2 class="text-3xl font-bold mb-3 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                    Email Management Center
+                </h2>
+                <p class="text-blue-100 text-lg leading-relaxed max-w-2xl">
+                    Manage all your email accounts and AI-powered features in one place with intelligent automation
+                </p>
+                <div class="flex items-center space-x-6 mt-4 text-blue-100">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm">AI Active</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-sm">Real-time Sync</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="/emails/dashboard/" 
+                   class="inline-flex items-center justify-center px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-blue-50 transition-all duration-200 transform hover:scale-105">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Open Dashboard
+                </a>
+                <a href="#" 
+                   class="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-medium rounded-lg border border-white/20 hover:bg-white/20 transition-all duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Quick Actions
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Navigation -->
+    <div class="mb-8">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-1 shadow-sm">
+            <nav class="flex flex-wrap gap-1">
+                <button @click="activeTab = 'overview'" 
+                        :class="activeTab === 'overview' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'"
+                        class="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                        hx-get="/partials/dashboard-overview/"
+                        hx-target="#main-content"
+                        hx-push-url="false">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9 6 9-6"></path>
+                    </svg>
+                    Overview
+                </button>
+                <button @click="activeTab = 'inbox'" 
+                        :class="activeTab === 'inbox' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'"
+                        class="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                        hx-get="/partials/email-inbox/"
+                        hx-target="#main-content"
+                        hx-push-url="false">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                    </svg>
+                    Inbox
+                    <span class="ml-2 px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs rounded-full">23</span>
+                </button>
+                <button @click="activeTab = 'accounts'" 
+                        :class="activeTab === 'accounts' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'"
+                        class="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                        data-tab="accounts"
+                        hx-get="/partials/email-accounts/"
+                        hx-target="#main-content"
+                        hx-push-url="false">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    Accounts
+                </button>
+                <button @click="activeTab = 'stats'" 
+                        :class="activeTab === 'stats' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'"
+                        class="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                        hx-get="/partials/email-stats/"
+                        hx-target="#main-content"
+                        hx-push-url="false">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Statistics
+                </button>
+                <button @click="activeTab = 'realtime'" 
+                        :class="activeTab === 'realtime' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'"
+                        class="inline-flex items-center px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+                        @click="loadRealtimeDashboard()">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
+                    Real-time
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div id="main-content" 
+         hx-get="/partials/dashboard-overview/"
+         hx-trigger="load"
+         hx-indicator="#main-loading">
+        
+        <!-- Loading State -->
+        <div id="main-loading" class="flex items-center justify-center py-12">
+            <div class="flex items-center space-x-3">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span class="text-slate-500 dark:text-slate-400">Loading dashboard...</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Global HTMX Loading Indicator -->
+    <div id="htmx-global-loading" class="htmx-indicator fixed top-4 right-4 z-50">
+        <div class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
+            <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+            <span class="text-sm">Loading...</span>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Add HTMX Configuration -->
+<script>
+function loadRealtimeDashboard() {
+    // Load the real-time dashboard component
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+        fetch('/core/partials/realtime_dashboard.html')
+            .then(response => response.text())
+            .then(html => {
+                mainContent.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading real-time dashboard:', error);
+                mainContent.innerHTML = '<div class="text-center py-8 text-red-500">Error loading real-time dashboard</div>';
+            });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Global HTMX configuration
+    htmx.config.globalViewTransitions = true;
+    htmx.config.defaultSwapStyle = 'innerHTML';
+    htmx.config.defaultSwapDelay = 0;
+    htmx.config.defaultSettleDelay = 20;
+    
+    // Check for OAuth success and refresh accounts tab
+    {% if account_connected %}
+        console.log('OAuth success detected for account: {{ connected_account_email }}');
+        
+        // Switch to accounts tab and refresh it
+        setTimeout(function() {
+            // Update active tab visual state
+            const accountsTab = document.querySelector('[data-tab="accounts"]');
+            if (accountsTab) {
+                // Remove active state from all tabs
+                document.querySelectorAll('.border-blue-500').forEach(tab => {
+                    tab.classList.remove('border-blue-500', 'text-blue-600');
+                    tab.classList.add('border-transparent', 'text-slate-500');
+                });
+                
+                // Add active state to accounts tab
+                accountsTab.classList.remove('border-transparent', 'text-slate-500');
+                accountsTab.classList.add('border-blue-500', 'text-blue-600');
+                
+                // Trigger HTMX request to load accounts
+                htmx.trigger(accountsTab, 'click');
+            } else {
+                // Fallback: directly refresh the main content with accounts
+                htmx.ajax('GET', '/partials/email-accounts/', '#main-content');
+            }
+            
+            // Show success notification
+            showAccountConnectedNotification('{{ connected_account_email }}');
+        }, 500);
+    {% endif %}
+    
+    // Global HTMX event listeners
+    document.body.addEventListener('htmx:configRequest', function(evt) {
+        // Add CSRF token to all HTMX requests
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        if (csrfToken) {
+            evt.detail.headers['X-CSRFToken'] = csrfToken;
+        }
+    });
+    
+    document.body.addEventListener('htmx:beforeRequest', function(evt) {
+        // Show global loading indicator
+        const indicator = document.getElementById('htmx-global-loading');
+        if (indicator) {
+            indicator.style.display = 'block';
+        }
+    });
+    
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        // Hide global loading indicator
+        const indicator = document.getElementById('htmx-global-loading');
+        if (indicator) {
+            indicator.style.display = 'none';
+        }
+    });
+    
+    document.body.addEventListener('htmx:responseError', function(evt) {
+        // Handle HTMX errors
+        console.error('HTMX Error:', evt.detail);
+        // You could show a toast notification here
+    });
+});
+
+// Function to show account connected notification
+function showAccountConnectedNotification(email) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2';
+    notification.innerHTML = `
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span>Gmail account ${email} connected successfully!</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(function() {
+        notification.remove();
+    }, 5000);
+}
+</script>
+                    <p class="text-2xl font-semibold text-slate-900 dark:text-slate-100">149</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
+                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">AI Drafts</p>
+                    <p class="text-2xl font-semibold text-slate-900 dark:text-slate-100">87</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Email Accounts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Gmail Account -->
+        <div class="card" x-data="{ expanded: false }">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600 dark:text-red-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819v.273L12 8.821l6.545-4.727v-.273h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100">Gmail Account</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">john.doe@gmail.com</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="badge badge-success">Connected</span>
+                    <button @click="expanded = !expanded" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md">
+                        <svg class="w-4 h-4 transition-transform" :class="expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div x-show="expanded" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-2"
+                 class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Unread</p>
+                        <p class="text-lg font-semibold text-slate-900 dark:text-slate-100">23</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Drafts</p>
+                        <p class="text-lg font-semibold text-slate-900 dark:text-slate-100">7</p>
+                    </div>
+                </div>
+                <div class="mt-4 flex space-x-2">
+                    <button class="btn btn-primary btn-sm">Sync Now</button>
+                    <button class="btn btn-outline btn-sm">Settings</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Outlook Account -->
+        <div class="card" x-data="{ expanded: false }">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7.462 23.996c-2.205 0-4.005-1.8-4.005-4.005V4.009c0-2.205 1.8-4.005 4.005-4.005h9.076c2.205 0 4.005 1.8 4.005 4.005v15.982c0 2.205-1.8 4.005-4.005 4.005H7.462zm4.538-12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100">Outlook Account</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">john.doe@outlook.com</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="badge badge-warning">Syncing</span>
+                    <button @click="expanded = !expanded" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-md">
+                        <svg class="w-4 h-4 transition-transform" :class="expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div x-show="expanded" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-2"
+                 class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Unread</p>
+                        <p class="text-lg font-semibold text-slate-900 dark:text-slate-100">41</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Drafts</p>
+                        <p class="text-lg font-semibold text-slate-900 dark:text-slate-100">12</p>
+                    </div>
+                </div>
+                <div class="mt-4 flex space-x-2">
+                    <button class="btn btn-primary btn-sm">Sync Now</button>
+                    <button class="btn btn-outline btn-sm">Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity & AI Features -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100">Recent Activity</h3>
+                <button class="btn btn-outline btn-sm">View All</button>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-slate-900 dark:text-slate-100">Email categorized as "To Respond"</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">2 minutes ago</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-slate-900 dark:text-slate-100">AI draft created for reply</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">5 minutes ago</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-slate-900 dark:text-slate-100">Meeting transcript processed</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">1 hour ago</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AI Features Demo -->
+        <div class="card" x-data="AlpineComponents.modal()">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100">AI Features</h3>
+                <button @click="show()" class="btn btn-primary btn-sm">Try Demo</button>
+            </div>
+            <div class="space-y-4">
+                <div class="p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                    <h4 class="font-medium text-slate-900 dark:text-slate-100 mb-2">Smart Categorization</h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">Automatically categorize emails into "To Respond", "FYI", and "Marketing" using AI.</p>
+                </div>
+                
+                <div class="p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                    <h4 class="font-medium text-slate-900 dark:text-slate-100 mb-2">AI Draft Replies</h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">Generate contextual email replies in your tone and style.</p>
+                </div>
+                
+                <div class="p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                    <h4 class="font-medium text-slate-900 dark:text-slate-100 mb-2">Meeting Summaries</h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">Get AI-generated summaries and action items from meeting transcripts.</p>
+                </div>
+            </div>
+            
+            <!-- Modal -->
+            <div x-show="open" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 bg-slate-600 bg-opacity-75 z-50 flex items-center justify-center p-4"
+                 @click.self="hide()">
+                <div x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-95"
+                     class="bg-white dark:bg-slate-800 rounded-lg p-6 max-w-md w-full">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100">AI Features Demo</h3>
+                        <button @click="hide()" class="text-slate-400 hover:text-slate-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6">
+                        Experience the power of AI-driven email management. Connect your accounts to start using intelligent categorization and automated draft generation.
+                    </p>
+                    <div class="flex space-x-3">
+                        <button @click="hide()" class="btn btn-primary flex-1">Get Started</button>
+                        <button @click="hide()" class="btn btn-outline flex-1">Learn More</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

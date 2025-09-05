@@ -1,0 +1,64 @@
+# Core Django
+Django
+django-environ
+psycopg2-binary
+
+# API and Authentication
+djangorestframework
+django-oauth-toolkit
+django-cors-headers
+
+# Database and Caching
+redis
+django-redis
+
+# AI and External APIs
+openai
+requests
+
+# Security
+cryptography
+django-cryptography
+
+# AWS Integration
+boto3
+django-storages
+
+# Email Processing
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+msgraph-sdk
+msal
+
+# ML/AI for Classification
+transformers
+torch
+sentencepiece
+
+# Development and Testing
+pytest
+pytest-django
+pytest-asyncio
+pytest-cov
+factory-boy
+coverage
+
+# Code Quality
+flake8
+black
+isort
+
+# Production
+gunicorn
+whitenoise
+sentry-sdk
+
+# Task Queue
+celery
+django-celery-beat
+
+# WebSocket Support
+channels
+channels-redis
+daphne

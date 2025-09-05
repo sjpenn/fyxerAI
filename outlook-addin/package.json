@@ -1,0 +1,46 @@
+{
+  "name": "fyxerai-outlook-addin",
+  "version": "1.0.0",
+  "description": "FYXERAI Outlook Add-in for AI-powered email management",
+  "main": "taskpane.html",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "build:dev": "webpack --mode=development",
+    "dev-server": "webpack serve --mode=development",
+    "start": "office-addin-dev-certs install && office-addin-dev-certs verify && npm run dev-server",
+    "validate": "office-addin-manifest validate manifest.xml",
+    "sideload": "office-addin-debugging start manifest.xml desktop"
+  },
+  "keywords": [
+    "Office Add-in",
+    "Outlook",
+    "FYXERAI",
+    "AI",
+    "Email"
+  ],
+  "author": "FyxerAI",
+  "license": "MIT",
+  "dependencies": {
+    "office-js": "^1.1.77"
+  },
+  "devDependencies": {
+    "@types/office-js": "^1.0.369",
+    "office-addin-debugging": "^5.0.15",
+    "office-addin-dev-certs": "^1.13.3",
+    "office-addin-lint": "^2.3.3",
+    "office-addin-manifest": "^1.13.3",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "html-webpack-plugin": "^5.5.3",
+    "copy-webpack-plugin": "^11.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fyxerai/outlook-addin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fyxerai/outlook-addin/issues"
+  },
+  "homepage": "https://github.com/fyxerai/outlook-addin#readme"
+}

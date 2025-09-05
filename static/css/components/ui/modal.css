@@ -1,0 +1,296 @@
+/* ShadCN UI Modal Component - Adapted for Alpine.js */
+
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50;
+  @apply flex items-center justify-center p-4;
+}
+
+.modal-container {
+  @apply bg-white dark:bg-slate-900 rounded-lg shadow-xl;
+  @apply border border-slate-200 dark:border-slate-800;
+  @apply w-full max-w-md max-h-[90vh] overflow-hidden;
+  @apply transform transition-all duration-300;
+}
+
+/* Modal Sizes */
+.modal-sm {
+  @apply max-w-sm;
+}
+
+.modal-md {
+  @apply max-w-md;
+}
+
+.modal-lg {
+  @apply max-w-lg;
+}
+
+.modal-xl {
+  @apply max-w-xl;
+}
+
+.modal-2xl {
+  @apply max-w-2xl;
+}
+
+.modal-3xl {
+  @apply max-w-3xl;
+}
+
+.modal-4xl {
+  @apply max-w-4xl;
+}
+
+.modal-full {
+  @apply max-w-full mx-4;
+}
+
+.modal-fullscreen {
+  @apply max-w-full max-h-full m-0 rounded-none;
+}
+
+/* Modal Header */
+.modal-header {
+  @apply flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800;
+}
+
+.modal-title {
+  @apply text-lg font-semibold text-slate-900 dark:text-slate-100;
+}
+
+.modal-subtitle {
+  @apply text-sm text-slate-500 dark:text-slate-400 mt-1;
+}
+
+.modal-close {
+  @apply p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md;
+  @apply text-slate-400 hover:text-slate-600 dark:hover:text-slate-300;
+  @apply transition-colors duration-200;
+}
+
+/* Modal Content */
+.modal-content {
+  @apply p-6 overflow-y-auto;
+}
+
+.modal-content-scroll {
+  @apply max-h-96 overflow-y-auto;
+}
+
+.modal-content-full {
+  @apply flex-1 overflow-y-auto;
+}
+
+/* Modal Footer */
+.modal-footer {
+  @apply flex items-center justify-end space-x-3 p-6;
+  @apply border-t border-slate-200 dark:border-slate-800;
+}
+
+.modal-footer-between {
+  @apply justify-between;
+}
+
+.modal-footer-center {
+  @apply justify-center;
+}
+
+.modal-footer-start {
+  @apply justify-start;
+}
+
+/* Modal Variants */
+.modal-success .modal-container {
+  @apply border-green-200 dark:border-green-800;
+}
+
+.modal-warning .modal-container {
+  @apply border-yellow-200 dark:border-yellow-800;
+}
+
+.modal-error .modal-container {
+  @apply border-red-200 dark:border-red-800;
+}
+
+.modal-info .modal-container {
+  @apply border-blue-200 dark:border-blue-800;
+}
+
+/* Modal States */
+.modal-loading .modal-content {
+  @apply relative;
+}
+
+.modal-loading .modal-content::before {
+  @apply absolute inset-0 bg-white/50 dark:bg-slate-900/50 z-10;
+  @apply flex items-center justify-center;
+  content: '';
+  background-image: url("data:image/svg+xml,%3csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83' stroke='%23374151' stroke-width='2' stroke-linecap='round'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: spin 1s linear infinite;
+}
+
+/* Enter Animations */
+.modal-enter {
+  @apply opacity-0 scale-95;
+}
+
+.modal-enter-active {
+  @apply opacity-100 scale-100;
+  @apply transition-all duration-300 ease-out;
+}
+
+.modal-leave {
+  @apply opacity-100 scale-100;
+}
+
+.modal-leave-active {
+  @apply opacity-0 scale-95;
+  @apply transition-all duration-200 ease-in;
+}
+
+/* Slide Animations */
+.modal-slide-up-enter {
+  @apply opacity-0 translate-y-4;
+}
+
+.modal-slide-up-enter-active {
+  @apply opacity-100 translate-y-0;
+  @apply transition-all duration-300 ease-out;
+}
+
+.modal-slide-down-enter {
+  @apply opacity-0 -translate-y-4;
+}
+
+.modal-slide-down-enter-active {
+  @apply opacity-100 translate-y-0;
+  @apply transition-all duration-300 ease-out;
+}
+
+/* Backdrop Animations */
+.modal-backdrop-enter {
+  @apply opacity-0;
+}
+
+.modal-backdrop-enter-active {
+  @apply opacity-100;
+  @apply transition-opacity duration-300 ease-out;
+}
+
+.modal-backdrop-leave {
+  @apply opacity-100;
+}
+
+.modal-backdrop-leave-active {
+  @apply opacity-0;
+  @apply transition-opacity duration-200 ease-in;
+}
+
+/* Focus Management */
+.modal-focus-trap {
+  @apply outline-none;
+}
+
+.modal-container:focus {
+  @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+  @apply dark:ring-primary-400 dark:ring-offset-slate-950;
+}
+
+/* Scrollable Modal */
+.modal-scrollable {
+  @apply flex flex-col max-h-[90vh];
+}
+
+.modal-scrollable .modal-content {
+  @apply flex-1 overflow-y-auto;
+}
+
+/* Modal with Form */
+.modal-form .modal-content {
+  @apply space-y-4;
+}
+
+.modal-form .form-group {
+  @apply space-y-2;
+}
+
+.modal-form label {
+  @apply block text-sm font-medium text-slate-700 dark:text-slate-300;
+}
+
+.modal-form input,
+.modal-form textarea,
+.modal-form select {
+  @apply input w-full;
+}
+
+/* Modal Responsive */
+@media (max-width: 640px) {
+  .modal-overlay {
+    @apply p-2;
+  }
+  
+  .modal-container {
+    @apply max-w-full mx-2;
+  }
+  
+  .modal-responsive .modal-header,
+  .modal-responsive .modal-content,
+  .modal-responsive .modal-footer {
+    @apply p-4;
+  }
+  
+  .modal-fullscreen-mobile {
+    @apply max-w-full max-h-full m-0 rounded-none;
+  }
+}
+
+/* Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Modal Stack (for multiple modals) */
+.modal-stack {
+  z-index: 1000;
+}
+
+.modal-stack + .modal-stack {
+  z-index: 1010;
+}
+
+.modal-stack + .modal-stack + .modal-stack {
+  z-index: 1020;
+}
+
+/* Confirm Dialog Styles */
+.modal-confirm .modal-container {
+  @apply max-w-sm;
+}
+
+.modal-confirm .modal-content {
+  @apply text-center;
+}
+
+.modal-confirm .modal-icon {
+  @apply w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center;
+}
+
+.modal-confirm-success .modal-icon {
+  @apply bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400;
+}
+
+.modal-confirm-warning .modal-icon {
+  @apply bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-400;
+}
+
+.modal-confirm-error .modal-icon {
+  @apply bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400;
+}

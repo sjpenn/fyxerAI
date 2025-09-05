@@ -1,0 +1,38 @@
+Traceback (most recent call last):
+  File "/opt/homebrew/bin/daphne", line 7, in <module>
+    sys.exit(CommandLineInterface.entrypoint())
+  File "/opt/homebrew/lib/python3.10/site-packages/daphne/cli.py", line 171, in entrypoint
+    cls().run(sys.argv[1:])
+  File "/opt/homebrew/lib/python3.10/site-packages/daphne/cli.py", line 239, in run
+    application = self.load_asgi_app(args.application)
+  File "/opt/homebrew/lib/python3.10/site-packages/daphne/cli.py", line 208, in load_asgi_app
+    return import_by_path(asgi_app_path)
+  File "/opt/homebrew/lib/python3.10/site-packages/daphne/utils.py", line 17, in import_by_path
+    target = importlib.import_module(module_path)
+  File "/opt/homebrew/Cellar/python@3.10/3.10.18/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/sjpenn/Sites/fyxerAI-GEDS/./fyxerai_assistant/asgi.py", line 18, in <module>
+    from core.routing import websocket_urlpatterns
+  File "/Users/sjpenn/Sites/fyxerAI-GEDS/./core/routing.py", line 6, in <module>
+    from . import consumers
+  File "/Users/sjpenn/Sites/fyxerAI-GEDS/./core/consumers.py", line 13, in <module>
+    from .models import EmailAccount, EmailMessage
+  File "/Users/sjpenn/Sites/fyxerAI-GEDS/./core/models.py", line 2, in <module>
+    from django.contrib.auth.models import AbstractUser
+  File "/opt/homebrew/lib/python3.10/site-packages/django/contrib/auth/models.py", line 5, in <module>
+    from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+  File "/opt/homebrew/lib/python3.10/site-packages/django/contrib/auth/base_user.py", line 43, in <module>
+    class AbstractBaseUser(models.Model):
+  File "/opt/homebrew/lib/python3.10/site-packages/django/db/models/base.py", line 131, in __new__
+    app_config = apps.get_containing_app_config(module)
+  File "/opt/homebrew/lib/python3.10/site-packages/django/apps/registry.py", line 260, in get_containing_app_config
+    self.check_apps_ready()
+  File "/opt/homebrew/lib/python3.10/site-packages/django/apps/registry.py", line 138, in check_apps_ready
+    raise AppRegistryNotReady("Apps aren't loaded yet.")
+django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.

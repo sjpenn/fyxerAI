@@ -1,0 +1,111 @@
+<!-- Email Statistics Partial -->
+<div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+    <!-- Header -->
+    <div class="border-b border-slate-200 dark:border-slate-700 p-6">
+        <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Email Statistics</h2>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="p-6">
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ total_messages }}</div>
+                <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">Total Messages</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-orange-600 dark:text-orange-400">{{ unread_messages }}</div>
+                <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">Unread</div>
+            </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div>
+            <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-4">Category Breakdown</h3>
+            
+            {% if category_stats %}
+                <div class="space-y-4">
+                    {% for stat in category_stats %}
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="badge badge-{% if stat.category == 'urgent' %}error{% elif stat.category == 'important' %}warning{% elif stat.category == 'newsletter' %}secondary{% else %}primary{% endif %}">
+                                    {{ stat.category|capfirst }}
+                                </span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                    {{ stat.count }}
+                                </div>
+                                <div class="w-24 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" 
+                                         style="width: {% widthratio stat.count total_messages 100 %}%"></div>
+                                </div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 w-12 text-right">
+                                    {% widthratio stat.count total_messages 100 %}%
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <h3 class="mt-4 text-sm font-medium text-slate-900 dark:text-slate-100">No data available</h3>
+                    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                        Statistics will appear here once you have email messages.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+            <h4 class="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">Quick Actions</h4>
+            <div class="grid grid-cols-2 gap-3">
+                <button class="btn-sm btn-outline w-full"
+                        hx-get="/partials/email-inbox/?category=urgent"
+                        hx-target="#main-content">
+                    View Urgent
+                </button>
+                <button class="btn-sm btn-outline w-full"
+                        hx-get="/partials/email-inbox/?category=important"
+                        hx-target="#main-content">
+                    View Important
+                </button>
+                <button class="btn-sm btn-outline w-full"
+                        hx-get="/partials/email-inbox/"
+                        hx-target="#main-content">
+                    View All
+                </button>
+                <button class="btn-sm btn-primary w-full"
+                        hx-get="/partials/email-stats/"
+                        hx-target="#main-content"
+                        hx-indicator="#stats-loading">
+                    <span id="stats-loading" class="htmx-indicator">
+                        <div class="animate-spin mr-1 w-3 h-3 border border-white border-t-transparent rounded-full inline-block"></div>
+                    </span>
+                    Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trends Chart Placeholder -->
+<div class="mt-6 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="border-b border-slate-200 dark:border-slate-700 p-6">
+        <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100">Email Trends</h3>
+    </div>
+    <div class="p-6">
+        <div class="h-32 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
+            <div class="text-center">
+                <svg class="mx-auto h-8 w-8 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Chart coming soon</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FYXERAI Email Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="fyxerai-popup">
+    <!-- Header -->
+    <div class="fyxerai-popup-header">
+        <div class="fyxerai-popup-logo">
+            <div class="fyxerai-logo-icon">
+                <span>F</span>
+            </div>
+            <div class="fyxerai-popup-title">
+                <h1>FYXERAI</h1>
+                <p>Email Assistant</p>
+            </div>
+        </div>
+        <div class="fyxerai-connection-status" id="connectionStatus">
+            <div class="fyxerai-status-dot" id="statusDot"></div>
+            <span id="statusText">Checking...</span>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="fyxerai-popup-stats">
+        <div class="fyxerai-stat-item">
+            <div class="fyxerai-stat-number" id="emailsProcessed">0</div>
+            <div class="fyxerai-stat-label">Emails Triaged</div>
+        </div>
+        <div class="fyxerai-stat-item">
+            <div class="fyxerai-stat-number" id="draftsCreated">0</div>
+            <div class="fyxerai-stat-label">Drafts Created</div>
+        </div>
+        <div class="fyxerai-stat-item">
+            <div class="fyxerai-stat-number" id="timesSaved">0h</div>
+            <div class="fyxerai-stat-label">Time Saved</div>
+        </div>
+    </div>
+
+    <!-- Main Actions -->
+    <div class="fyxerai-popup-actions">
+        <button class="fyxerai-btn fyxerai-btn-primary" id="triageInboxBtn">
+            <svg class="fyxerai-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+            </svg>
+            Triage Inbox
+        </button>
+
+        <button class="fyxerai-btn fyxerai-btn-secondary" id="generateDraftsBtn">
+            <svg class="fyxerai-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Generate Drafts
+        </button>
+
+        <button class="fyxerai-btn fyxerai-btn-outline" id="openDashboardBtn">
+            <svg class="fyxerai-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Open Dashboard
+        </button>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="fyxerai-popup-section">
+        <h3 class="fyxerai-section-title">Recent Activity</h3>
+        <div class="fyxerai-activity-list" id="activityList">
+            <div class="fyxerai-activity-item">
+                <div class="fyxerai-activity-icon fyxerai-activity-triage">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5"/>
+                    </svg>
+                </div>
+                <div class="fyxerai-activity-content">
+                    <div class="fyxerai-activity-title">Inbox Triaged</div>
+                    <div class="fyxerai-activity-time">2 minutes ago</div>
+                </div>
+                <div class="fyxerai-activity-count">15</div>
+            </div>
+
+            <div class="fyxerai-activity-item">
+                <div class="fyxerai-activity-icon fyxerai-activity-draft">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div class="fyxerai-activity-content">
+                    <div class="fyxerai-activity-title">AI Drafts Created</div>
+                    <div class="fyxerai-activity-time">5 minutes ago</div>
+                </div>
+                <div class="fyxerai-activity-count">3</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Settings -->
+    <div class="fyxerai-popup-section">
+        <h3 class="fyxerai-section-title">Quick Settings</h3>
+        <div class="fyxerai-settings-list">
+            <div class="fyxerai-setting-item">
+                <label class="fyxerai-setting-label">
+                    <input type="checkbox" id="autoTriageEnabled" checked>
+                    <span class="fyxerai-checkbox"></span>
+                    Auto-triage new emails
+                </label>
+            </div>
+
+            <div class="fyxerai-setting-item">
+                <label class="fyxerai-setting-label">
+                    <input type="checkbox" id="notificationsEnabled" checked>
+                    <span class="fyxerai-checkbox"></span>
+                    Show notifications
+                </label>
+            </div>
+
+            <div class="fyxerai-setting-item">
+                <label class="fyxerai-setting-label">
+                    <select id="draftTone" class="fyxerai-select">
+                        <option value="professional">Professional</option>
+                        <option value="friendly">Friendly</option>
+                        <option value="formal">Formal</option>
+                        <option value="casual">Casual</option>
+                    </select>
+                    <span class="fyxerai-select-label">Draft tone</span>
+                </label>
+            </div>
+
+            <div class="fyxerai-setting-item">
+                <label class="fyxerai-setting-label">
+                    <input type="checkbox" id="developmentModeEnabled" checked>
+                    <span class="fyxerai-checkbox"></span>
+                    Development mode (localhost:8000)
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="fyxerai-loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="fyxerai-loading-spinner"></div>
+        <div class="fyxerai-loading-text" id="loadingText">Processing...</div>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div class="fyxerai-message" id="messageContainer" style="display: none;">
+        <div class="fyxerai-message-content" id="messageContent"></div>
+        <button class="fyxerai-message-close" id="messageClose">&times;</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="fyxerai-popup-footer">
+        <div class="fyxerai-footer-links">
+            <a href="#" id="settingsLink" class="fyxerai-footer-link">Settings</a>
+            <a href="#" id="helpLink" class="fyxerai-footer-link">Help</a>
+            <a href="#" id="feedbackLink" class="fyxerai-footer-link">Feedback</a>
+        </div>
+        <div class="fyxerai-version">v1.0.0</div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

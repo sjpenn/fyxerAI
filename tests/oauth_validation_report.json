@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-09-04T20:44:48.267Z",
+  "baseUrl": "http://localhost:8001",
+  "debugPage": {
+    "accessible": false,
+    "credentialsConfigured": false
+  },
+  "oauthFlow": {
+    "success": false,
+    "issue": "not_tested"
+  },
+  "recommendations": [
+    "Configure Google OAuth credentials in your .env file",
+    "Ensure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set"
+  ]
+}

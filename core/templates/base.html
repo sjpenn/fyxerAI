@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}FYXERAI - AI-powered email assistant for Gmail and Outlook. Automate email triage, generate AI drafts, and manage multiple accounts.{% endblock %}">
+    <meta name="author" content="FYXERAI">
+    <meta name="keywords" content="{% block meta_keywords %}email assistant, AI, Gmail, Outlook, email automation, productivity, AI drafts{% endblock %}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}FYXERAI - AI Email Assistant{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Automate your email workflow with AI-powered triage and draft generation{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% load static %}{% static 'images/og-image.jpg' %}{% endblock %}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{% block twitter_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta property="twitter:title" content="{% block twitter_title %}FYXERAI - AI Email Assistant{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Automate your email workflow with AI-powered triage and draft generation{% endblock %}">
+    <meta property="twitter:image" content="{% block twitter_image %}{% load static %}{% static 'images/twitter-image.jpg' %}{% endblock %}">
+    
+    <title>{% block title %}FYXERAI Dashboard - AI Email Assistant{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{% load static %}{% static 'icons/icon32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% load static %}{% static 'icons/icon16.png' %}">
+    
+    <!-- Tailwind CSS -->
+    <link href="{% load static %}{% static 'css/output.css' %}" rel="stylesheet">
+    
+    <!-- Preload Alpine.js for better performance -->
+    <link rel="preload" href="{% load static %}{% static 'js/alpine.min.js' %}" as="script">
+    <link rel="preload" href="{% load static %}{% static 'js/alpine-config.js' %}" as="script">
+    
+    <!-- Custom fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Additional meta tags for PWA support -->
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans antialiased" 
+      x-data="{ sidebarOpen: false }" 
+      x-init="$store.theme.init()">
+    
+    <!-- CSRF Token for Alpine.js AJAX requests -->
+    {% csrf_token %}
+    
+    <!-- Loading Indicator -->
+    <div x-show="$store.app.loading" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            <span class="text-lg font-medium">Loading...</span>
+        </div>
+    </div>
+    
+    <!-- Toast Notifications -->
+    <div x-data="AlpineComponents.toast()" 
+         x-show="show"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-2"
+         class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-sm w-full">
+        <div class="p-4 rounded-lg shadow-lg border"
+             :class="{
+                 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-200': type === 'info',
+                 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900 dark:border-green-700 dark:text-green-200': type === 'success',
+                 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:border-yellow-700 dark:text-yellow-200': type === 'warning',
+                 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900 dark:border-red-700 dark:text-red-200': type === 'error'
+             }">
+            <div class="flex items-center justify-between">
+                <p class="font-medium" x-text="message"></p>
+                <button @click="hide()" class="ml-3 hover:opacity-70">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Sidebar Overlay -->
+    <div x-show="sidebarOpen" 
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="sidebarOpen = false"
+         class="fixed inset-0 bg-slate-600 bg-opacity-75 z-30 lg:hidden"></div>
+    
+    <div class="flex h-screen bg-slate-50 dark:bg-slate-900">
+        <!-- Sidebar -->
+        <aside class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 transform transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 flex flex-col"
+               :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+            
+            <!-- Logo -->
+            <div class="flex items-center justify-between h-16 px-6 border-b border-slate-200 dark:border-slate-700">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center" style="background: linear-gradient(to right, rgb(59, 130, 246), rgb(217, 70, 239)); background-color: rgb(37, 99, 235);">
+                        <span class="text-white font-bold text-lg">F</span>
+                    </div>
+                    <span class="ml-3 text-xl font-semibold">FYXERAI</span>
+                </div>
+                <button @click="sidebarOpen = false" class="lg:hidden p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="flex-1 mt-6 overflow-y-auto" x-data="{ activeSection: 'dashboard' }">
+                {% block sidebar %}
+                {% if not user.is_authenticated %}
+                <!-- Authentication Section (for non-authenticated users) -->
+                <div class="px-3 mb-6">
+                    <p class="px-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                        Get Started
+                    </p>
+                    <div class="space-y-2">
+                        <a href="{% url 'core:login' %}" 
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                            </svg>
+                            Sign In
+                        </a>
+                        <a href="{% url 'core:signup' %}" 
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm"
+                           style="background: linear-gradient(to right, rgb(59, 130, 246), rgb(217, 70, 239)); background-color: rgb(37, 99, 235);">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                            </svg>
+                            Sign Up
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Main Navigation -->
+                <div class="px-3">
+                    <p class="px-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                        Email Management
+                    </p>
+                    <div class="space-y-1">
+                        <a href="{% url 'core:home' %}" 
+                           :class="{ 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400': activeSection === 'dashboard' }"
+                           @click="activeSection = 'dashboard'"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9 6 9-6"></path>
+                            </svg>
+                            Dashboard
+                        </a>
+                        
+                        <div x-data="{ accountsOpen: false }">
+                            <button @click="accountsOpen = !accountsOpen; activeSection = 'accounts'"
+                                   :class="{ 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400': activeSection === 'accounts' }"
+                                   class="group flex items-center w-full px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                                <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                                Email Accounts
+                                <span class="ml-auto flex items-center space-x-2">
+                                    <span id="sidebar-account-count" class="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 text-xs px-2 py-0.5 rounded-full">{{ user.email_accounts.count|default:0 }}</span>
+                                    <svg class="w-4 h-4 transition-transform duration-200" 
+                                         :class="accountsOpen ? 'rotate-90' : ''"
+                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </span>
+                            </button>
+                            
+                            <!-- Nested Account List -->
+                            <div id="sidebar-account-list" x-show="accountsOpen" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 -translate-y-1"
+                                 class="mt-2 ml-8 space-y-1"
+                                 hx-get="{% url 'core:account_menu' %}"
+                                 hx-trigger="revealed"
+                                 hx-swap="innerHTML">
+                                <!-- Loading state -->
+                                <div class="flex items-center px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
+                                    <div class="w-3 h-3 border border-slate-300 border-t-slate-600 rounded-full animate-spin mr-2"></div>
+                                    Loading accounts...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <a href="/emails/dashboard/" 
+                           :class="{ 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400': activeSection === 'email-dashboard' }"
+                           @click="activeSection = 'email-dashboard'"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            Email Dashboard
+                            <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">New</span>
+                        </a>
+                        
+                        <a href="#" 
+                           :class="{ 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400': activeSection === 'inbox' }"
+                           @click="activeSection = 'inbox'"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                            </svg>
+                            Unified Inbox
+                            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">23</span>
+                        </a>
+                        
+                        <a href="#" 
+                           :class="{ 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400': activeSection === 'drafts' }"
+                           @click="activeSection = 'drafts'"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            AI Drafts
+                            <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">7</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Analytics Section -->
+                <div class="px-3 mt-8">
+                    <p class="px-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                        Analytics
+                    </p>
+                    <div class="space-y-1">
+                        <a href="#" 
+                           :class="{ 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400': activeSection === 'reports' }"
+                           @click="activeSection = 'reports'"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Reports
+                        </a>
+                        
+                        <a href="#" 
+                           :class="{ 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400': activeSection === 'insights' }"
+                           @click="activeSection = 'insights'"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            AI Insights
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div class="px-3 mt-8">
+                    <p class="px-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                        Settings
+                    </p>
+                    <div class="space-y-1">
+                        <a href="#" 
+                           :class="{ 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400': activeSection === 'preferences' }"
+                           @click="activeSection = 'preferences'"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Preferences
+                        </a>
+                        
+                        <a href="{% url 'core:components' %}" 
+                           :class="{ 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400': activeSection === 'components' }"
+                           @click="activeSection = 'components'"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="mr-3 w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v14a2 2 0 01-2 2h-4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v14a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+                            </svg>
+                            Components
+                            <span class="ml-auto bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full">New</span>
+                        </a>
+                    </div>
+                </div>
+                {% endblock %}
+            </nav>
+            
+            <!-- Theme Toggle at Bottom of Sidebar (outside of scrollable nav) -->
+            <div class="px-3 pb-4">
+                <div class="border-t border-slate-200 dark:border-slate-700 pt-4">
+                    <button x-data="AlpineComponents.themeToggle()" 
+                            @click="toggle()"
+                            data-theme-toggle
+                            class="w-full flex items-center justify-center px-3 py-2 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                            :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
+                        <!-- Sun icon (light mode) -->
+                        <svg x-show="!isDark" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 rotate-90"
+                             x-transition:enter-end="opacity-100 rotate-0"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 rotate-0"
+                             x-transition:leave-end="opacity-0 rotate-90"
+                             class="w-5 h-5 text-yellow-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <!-- Moon icon (dark mode) -->
+                        <svg x-show="isDark" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -rotate-90"
+                             x-transition:enter-end="opacity-100 rotate-0"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 rotate-0"
+                             x-transition:leave-end="opacity-0 -rotate-90"
+                             class="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span x-text="isDark ? 'Light Mode' : 'Dark Mode'"></span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Header -->
+            <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-md text-slate-500 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                        <div class="ml-4 lg:ml-0">
+                            <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">
+                                {% block page_title %}Dashboard{% endblock %}
+                            </h1>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">
+                                {% block page_subtitle %}Manage your email accounts and AI-powered assistance{% endblock %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Connection Status (Safari compatible) -->
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Connected</span>
+                        </div>
+                        
+                        <!-- Authentication Links -->
+                        {% if user.is_authenticated %}
+                            <!-- User Menu -->
+                            <div class="relative" x-data="{ userMenuOpen: false }">
+                                <button @click="userMenuOpen = !userMenuOpen" 
+                                        class="flex items-center space-x-2 text-sm text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+                                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center" style="background: linear-gradient(to right, rgb(59, 130, 246), rgb(217, 70, 239)); background-color: rgb(37, 99, 235);">
+                                        <span class="text-white font-medium text-sm">{{ user.username.0|upper }}</span>
+                                    </div>
+                                    <span class="hidden md:block">{{ user.username }}</span>
+                                    <svg class="w-4 h-4 transition-transform duration-200" 
+                                         :class="userMenuOpen ? 'rotate-180' : ''"
+                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                
+                                <!-- User Dropdown Menu -->
+                                <div x-show="userMenuOpen" 
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 scale-95"
+                                     x-transition:enter-end="opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100 scale-100"
+                                     x-transition:leave-end="opacity-0 scale-95"
+                                     @click.outside="userMenuOpen = false"
+                                     class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                                    <div class="py-1">
+                                        <a href="{% url 'core:user-profile' %}" 
+                                           class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                            Profile
+                                        </a>
+                                        <a href="{% url 'core:user-preferences' %}" 
+                                           class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                            Preferences
+                                        </a>
+                                        <div class="border-t border-slate-100 dark:border-slate-700"></div>
+                                        <a href="{% url 'admin:logout' %}" 
+                                           class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                            Sign Out
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- Login/Signup Links -->
+                            <div class="flex items-center space-x-3">
+                                <a href="{% url 'core:login' %}" 
+                                   class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+                                    Sign In
+                                </a>
+                                <a href="{% url 'core:signup' %}" 
+                                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm"
+                                   style="background: linear-gradient(to right, rgb(59, 130, 246), rgb(217, 70, 239)); background-color: rgb(37, 99, 235);">
+                                    Sign Up
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Page Content -->
+            <main class="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900 p-6">
+                {% block content %}
+                <div class="max-w-7xl mx-auto">
+                    <div class="bg-white dark:bg-slate-800 rounded-lg shadow p-6">
+                        <h2 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-4">
+                            Welcome to FYXERAI
+                        </h2>
+                        <p class="text-slate-600 dark:text-slate-400">
+                            Your AI-powered email assistant is ready to help you manage your Gmail and Outlook accounts.
+                        </p>
+                    </div>
+                </div>
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+    
+    <!-- HTMX Core -->
+    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    
+    <!-- Alpine.js Configuration -->
+    <script src="{% load static %}{% static 'js/alpine-config.js' %}"></script>
+    
+    <!-- Alpine.js Core -->
+    <script defer src="{% load static %}{% static 'js/alpine.min.js' %}"></script>
+    
+    <!-- Expose auth state to JS so realtime client only connects for logged-in users -->
+    <script>
+        window.fyxeraiUserAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+    </script>
+    <!-- WebSocket Real-time Client -->
+    <script src="{% load static %}{% static 'js/websocket-client.js' %}"></script>
+    
+    <!-- CSRF Token for HTMX -->
+    {% csrf_token %}
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

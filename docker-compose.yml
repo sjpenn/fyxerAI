@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    # Use Daphne ASGI server to support WebSockets in dev
+    command: ["sh", "-c", "python -c \"import socket,time,sys;\nfor i in range(60):\n    try:\n        s=socket.create_connection(('db',5432),2); s.close(); print('DB ready'); sys.exit(0)\n    except OSError:\n        print('Waiting for DB...'); time.sleep(2)\nsys.exit(1)\" && python manage.py migrate --noinput && daphne -b 0.0.0.0 -p 8000 fyxerai_assistant.asgi:application"]
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.podman
+    depends_on:
+      - db
+      - redis
+
+  worker:
+    build: .
+    command: ["sh", "-c", "python -c \"import socket,time,sys;\nfor i in range(60):\n    try:\n        s=socket.create_connection(('db',5432),2); s.close(); print('DB ready'); sys.exit(0)\n    except OSError:\n        print('Waiting for DB...'); time.sleep(2)\nsys.exit(1)\" && celery -A fyxerai_assistant worker -l info"]
+    volumes:
+      - .:/app
+    env_file:
+      - .env.podman
+    depends_on:
+      - db
+      - redis
+
+  beat:
+    build: .
+    command: ["celery", "-A", "fyxerai_assistant", "beat", "-l", "info"]
+    volumes:
+      - .:/app
+    env_file:
+      - .env.podman
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: fyxerai_geds
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+
+  redis:
+    image: redis:alpine
+    
+volumes:
+  postgres_data:

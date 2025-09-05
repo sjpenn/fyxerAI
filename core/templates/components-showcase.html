@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ShadCN UI Components Showcase{% endblock %}
+
+{% block page_title %}Component Showcase{% endblock %}
+{% block page_subtitle %}ShadCN UI components adapted for Alpine.js{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- Buttons Section -->
+    <section class="space-y-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Buttons</h2>
+            <p class="text-slate-600 dark:text-slate-400">Various button styles and states with Alpine.js integration.</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Button Variants</h3>
+            </div>
+            <div class="card-content space-y-4">
+                <!-- Primary Buttons -->
+                <div>
+                    <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Primary Buttons</h4>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="btn btn-primary btn-xs">Extra Small</button>
+                        <button class="btn btn-primary btn-sm">Small</button>
+                        <button class="btn btn-primary btn-md">Medium</button>
+                        <button class="btn btn-primary btn-lg">Large</button>
+                        <button class="btn btn-primary btn-xl">Extra Large</button>
+                    </div>
+                </div>
+                
+                <!-- Button States -->
+                <div>
+                    <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Button States</h4>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="btn btn-primary">Normal</button>
+                        <button class="btn btn-primary btn-loading">Loading</button>
+                        <button class="btn btn-primary" disabled>Disabled</button>
+                        <button 
+                            x-data="{ loading: false }"
+                            @click="loading = true; setTimeout(() => loading = false, 2000)"
+                            :class="{ 'btn btn-primary': true, 'btn-loading': loading }"
+                            :disabled="loading">
+                            <span x-show="!loading">Click Me</span>
+                            <span x-show="loading" class="sr-only">Loading...</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Button Variants -->
+                <div>
+                    <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Button Variants</h4>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="btn btn-primary">Primary</button>
+                        <button class="btn btn-secondary">Secondary</button>
+                        <button class="btn btn-outline">Outline</button>
+                        <button class="btn btn-ghost">Ghost</button>
+                        <button class="btn btn-destructive">Destructive</button>
+                        <button class="btn btn-success">Success</button>
+                        <button class="btn btn-warning">Warning</button>
+                    </div>
+                </div>
+                
+                <!-- Icon Buttons -->
+                <div>
+                    <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Icon Buttons</h4>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="btn btn-icon btn-primary">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                        <button class="btn btn-primary">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            With Icon
+                        </button>
+                        <button class="btn btn-outline">
+                            Download
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Cards Section -->
+    <section class="space-y-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Cards</h2>
+            <p class="text-slate-600 dark:text-slate-400">Card components with various layouts and interactions.</p>
+        </div>
+        
+        <div class="card-grid card-grid-3">
+            <!-- Basic Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Basic Card</h3>
+                    <p class="card-description">A simple card with header, content, and footer.</p>
+                </div>
+                <div class="card-content">
+                    <p class="text-slate-600 dark:text-slate-400">
+                        This is the main content area of the card. You can place any content here.
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary btn-sm">Action</button>
+                    <button class="btn btn-outline btn-sm">Cancel</button>
+                </div>
+            </div>
+            
+            <!-- Interactive Card -->
+            <div x-data="{ expanded: false }" class="card card-interactive">
+                <div class="card-header-row">
+                    <div>
+                        <h3 class="card-title">Interactive Card</h3>
+                        <p class="card-subtitle">Click to expand</p>
+                    </div>
+                    <button 
+                        @click="expanded = !expanded"
+                        class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md">
+                        <svg class="w-5 h-5 transition-transform" :class="{ 'rotate-180': expanded }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div 
+                    x-show="expanded"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 -translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    class="card-content">
+                    <p class="text-slate-600 dark:text-slate-400">
+                        This content is revealed when the card is expanded. Perfect for detailed information or additional controls.
+                    </p>
+                    <div class="flex space-x-2 mt-3">
+                        <button class="btn btn-primary btn-sm">Manage</button>
+                        <button class="btn btn-outline btn-sm">Settings</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistics Card -->
+            <div x-data="{ value: 0, target: 1247 }" x-init="setTimeout(() => { const start = performance.now(); const animate = (timestamp) => { const progress = Math.min((timestamp - start) / 1500, 1); value = Math.floor(progress * target); if (progress < 1) requestAnimationFrame(animate); }; requestAnimationFrame(animate); }, 100)" class="card">
+                <div class="card-content">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900 mr-4">
+                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Emails</p>
+                            <p class="text-2xl font-semibold text-slate-900 dark:text-slate-100" x-text="value.toLocaleString()">0</p>
+                            <p class="text-xs text-green-600 dark:text-green-400 flex items-center mt-1">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                                +12%
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Modals Section -->
+    <section class="space-y-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Modals</h2>
+            <p class="text-slate-600 dark:text-slate-400">Modal dialogs and overlays with Alpine.js state management.</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Modal Examples</h3>
+            </div>
+            <div class="card-content">
+                <div class="flex flex-wrap gap-3">
+                    <!-- Basic Modal Trigger -->
+                    <button 
+                        x-data
+                        @click="$dispatch('open-modal', { type: 'basic' })"
+                        class="btn btn-primary">
+                        Basic Modal
+                    </button>
+                    
+                    <!-- Confirmation Modal Trigger -->
+                    <button 
+                        x-data
+                        @click="$dispatch('open-modal', { type: 'confirm' })"
+                        class="btn btn-warning">
+                        Confirmation
+                    </button>
+                    
+                    <!-- Form Modal Trigger -->
+                    <button 
+                        x-data
+                        @click="$dispatch('open-modal', { type: 'form' })"
+                        class="btn btn-outline">
+                        Form Modal
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Components -->
+        <div x-data="{ 
+            basicModal: false,
+            confirmModal: false,
+            formModal: false
+        }" 
+        @open-modal.window="
+            if ($event.detail.type === 'basic') basicModal = true;
+            if ($event.detail.type === 'confirm') confirmModal = true;
+            if ($event.detail.type === 'form') formModal = true;
+        ">
+            
+            <!-- Basic Modal -->
+            <div 
+                x-show="basicModal"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                @click.self="basicModal = false"
+                @keydown.escape.window="basicModal = false"
+                class="modal-overlay">
+                
+                <div 
+                    class="modal-container"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95">
+                    
+                    <div class="modal-header">
+                        <h2 class="modal-title">Basic Modal</h2>
+                        <button @click="basicModal = false" class="modal-close">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-content">
+                        <p class="text-slate-600 dark:text-slate-400">
+                            This is a basic modal dialog. It can contain any content including text, forms, images, or other components.
+                        </p>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button @click="basicModal = false" class="btn btn-outline">Close</button>
+                        <button @click="basicModal = false" class="btn btn-primary">OK</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Confirmation Modal -->
+            <div 
+                x-show="confirmModal"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                @click.self="confirmModal = false"
+                @keydown.escape.window="confirmModal = false"
+                class="modal-overlay modal-confirm modal-confirm-warning">
+                
+                <div 
+                    class="modal-container"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100">
+                    
+                    <div class="modal-content">
+                        <div class="modal-icon">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                        
+                        <h3 class="modal-title mb-2">Confirm Action</h3>
+                        <p class="text-slate-600 dark:text-slate-400">
+                            Are you sure you want to perform this action? This cannot be undone.
+                        </p>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button @click="confirmModal = false" class="btn btn-outline">Cancel</button>
+                        <button @click="confirmModal = false" class="btn btn-warning">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Badges Section -->
+    <section class="space-y-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Badges</h2>
+            <p class="text-slate-600 dark:text-slate-400">Status indicators and labels with various styles.</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Badge Variants</h3>
+            </div>
+            <div class="card-content space-y-4">
+                <!-- Basic Badges -->
+                <div>
+                    <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Colors</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="badge badge-primary">Primary</span>
+                        <span class="badge badge-secondary">Secondary</span>
+                        <span class="badge badge-success">Success</span>
+                        <span class="badge badge-warning">Warning</span>
+                        <span class="badge badge-error">Error</span>
+                        <span class="badge badge-info">Info</span>
+                        <span class="badge badge-neutral">Neutral</span>
+                    </div>
+                </div>
+                
+                <!-- Outline Badges -->
+                <div>
+                    <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Outline</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="badge badge-outline badge-primary">Primary</span>
+                        <span class="badge badge-outline badge-success">Success</span>
+                        <span class="badge badge-outline badge-warning">Warning</span>
+                        <span class="badge badge-outline badge-error">Error</span>
+                    </div>
+                </div>
+                
+                <!-- Sizes -->
+                <div>
+                    <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Sizes</h4>
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <span class="badge badge-primary badge-xs">Extra Small</span>
+                        <span class="badge badge-primary badge-sm">Small</span>
+                        <span class="badge badge-primary badge-md">Medium</span>
+                        <span class="badge badge-primary badge-lg">Large</span>
+                        <span class="badge badge-primary badge-xl">Extra Large</span>
+                    </div>
+                </div>
+                
+                <!-- Interactive Badges -->
+                <div>
+                    <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Interactive</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <button x-data @click="$dispatch('custom-event')" class="badge badge-primary badge-clickable">
+                            Clickable
+                        </button>
+                        <span class="badge badge-success badge-pulse">
+                            Pulsing
+                        </span>
+                        <span class="badge badge-warning badge-dot">
+                            With Dot
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+</div>
+{% endblock %}

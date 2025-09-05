@@ -1,0 +1,3 @@
+# Spec Summary (Lite)
+
+Establish the foundational Django 4.2 web application with PostgreSQL database integration to serve as the backend infrastructure for the FYXERAI-GEDS email assistant. This setup provides the core framework for user management, email data storage, OAuth integration, and AI-powered features with a complete development environment, database models, and testing framework ready for email assistant feature development.

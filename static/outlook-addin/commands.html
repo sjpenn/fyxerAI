@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FYXERAI Commands</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+</head>
+
+<body>
+    <script>
+        const API_BASE = 'http://localhost:8002';
+        const API_ENDPOINTS = {
+            triage: '/api/emails/triage/',
+            reply: '/api/emails/reply/'
+        };
+
+        // Initialize Office.js
+        Office.onReady(() => {
+            console.log('FYXERAI Commands: Office.js ready');
+        });
+
+        /**
+         * Triage the current email using AI categorization
+         */
+        function triageEmail(event) {
+            console.log('FYXERAI Commands: Triaging email...');
+            
+            try {
+                const item = Office.context.mailbox.item;
+                
+                if (!item) {
+                    showNotification('No email selected', 'error');
+                    event.completed();
+                    return;
+                }
+
+                // Extract email data
+                const emailData = {
+                    subject: item.subject || 'No Subject',
+                    sender: item.from ? item.from.emailAddress : 'Unknown',
+                    id: item.internetMessageId || Date.now().toString(),
+                    platform: 'outlook'
+                };
+
+                // Call FYXERAI API
+                fetch(`${API_BASE}${API_ENDPOINTS.triage}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Outlook-Addin': 'fyxerai-commands'
+                    },
+                    body: JSON.stringify({
+                        platform: 'outlook',
+                        email: emailData,
+                        action: 'triage_single'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    const category = result.category || 'routine';
+                    
+                    // Add custom property to track categorization
+                    item.customProperties.set('fyxerai_category', category);
+                    item.customProperties.saveAsync();
+                    
+                    showNotification(`Email categorized as: ${category.toUpperCase()}`, 'success');
+                    console.log('FYXERAI Commands: Triage completed:', result);
+                })
+                .catch(error => {
+                    console.error('FYXERAI Commands: Triage failed:', error);
+                    showNotification('Triage failed: ' + error.message, 'error');
+                })
+                .finally(() => {
+                    event.completed();
+                });
+
+            } catch (error) {
+                console.error('FYXERAI Commands: Triage error:', error);
+                showNotification('Triage failed: ' + error.message, 'error');
+                event.completed();
+            }
+        }
+
+        /**
+         * Generate AI draft for the current email
+         */
+        function generateAIDraft(event) {
+            console.log('FYXERAI Commands: Generating AI draft...');
+            
+            try {
+                const item = Office.context.mailbox.item;
+                
+                if (!item) {
+                    showNotification('No email selected', 'error');
+                    event.completed();
+                    return;
+                }
+
+                // Get email body for context
+                item.body.getAsync(Office.CoercionType.Text, (bodyResult) => {
+                    if (bodyResult.status !== Office.AsyncResultStatus.Succeeded) {
+                        showNotification('Failed to read email content', 'error');
+                        event.completed();
+                        return;
+                    }
+
+                    const emailContent = {
+                        subject: item.subject || 'No Subject',
+                        sender: item.from ? item.from.emailAddress : 'Unknown',
+                        body: bodyResult.value.substring(0, 1000), // Limit body size
+                        platform: 'outlook'
+                    };
+
+                    // Call FYXERAI API
+                    fetch(`${API_BASE}${API_ENDPOINTS.reply}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Outlook-Addin': 'fyxerai-commands'
+                        },
+                        body: JSON.stringify({
+                            platform: 'outlook',
+                            email_content: emailContent,
+                            action: 'generate_single_draft'
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(result => {
+                        // Create draft reply
+                        if (result.draft) {
+                            Office.context.mailbox.displayReplyForm({
+                                htmlBody: result.draft,
+                                attachments: []
+                            });
+                            
+                            showNotification('AI draft generated successfully!', 'success');
+                        } else {
+                            throw new Error('No draft content received');
+                        }
+                        
+                        console.log('FYXERAI Commands: Draft generated');
+                    })
+                    .catch(error => {
+                        console.error('FYXERAI Commands: Draft generation failed:', error);
+                        showNotification('Draft generation failed: ' + error.message, 'error');
+                    })
+                    .finally(() => {
+                        event.completed();
+                    });
+                });
+
+            } catch (error) {
+                console.error('FYXERAI Commands: Draft generation error:', error);
+                showNotification('Draft generation failed: ' + error.message, 'error');
+                event.completed();
+            }
+        }
+
+        /**
+         * Show notification to user
+         */
+        function showNotification(message, type = 'info') {
+            try {
+                let iconType;
+                switch (type) {
+                    case 'success':
+                        iconType = Office.MailboxEnums.IconType.InformationMessage;
+                        break;
+                    case 'error':
+                        iconType = Office.MailboxEnums.IconType.ErrorMessage;
+                        break;
+                    default:
+                        iconType = Office.MailboxEnums.IconType.InformationMessage;
+                }
+
+                Office.context.mailbox.item.notificationMessages.addAsync('fyxerai_notification', {
+                    type: iconType,
+                    message: message,
+                    icon: 'Icon.16x16',
+                    persistent: false
+                });
+
+                // Auto-remove notification after 5 seconds
+                setTimeout(() => {
+                    try {
+                        Office.context.mailbox.item.notificationMessages.removeAsync('fyxerai_notification');
+                    } catch (e) {
+                        // Ignore removal errors
+                    }
+                }, 5000);
+
+            } catch (error) {
+                console.error('Failed to show notification:', error);
+            }
+        }
+
+        // Register functions globally for Office.js
+        Office.actions = {
+            triageEmail: triageEmail,
+            generateAIDraft: generateAIDraft
+        };
+        
+        // For backward compatibility
+        window.triageEmail = triageEmail;
+        window.generateAIDraft = generateAIDraft;
+    </script>
+</body>
+</html>

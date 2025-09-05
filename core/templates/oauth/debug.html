@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}OAuth Debug - FYXERAI{% endblock %}
+
+{% block page_title %}OAuth Configuration Debug{% endblock %}
+{% block page_subtitle %}Diagnose Google OAuth setup issues{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-8">
+        
+        <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">OAuth Configuration Status</h2>
+        
+        <!-- Configuration Check -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-3">Current Configuration</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">Google Client ID:</span>
+                        <span class="font-mono text-slate-900 dark:text-slate-100">{{ google_client_id_configured|yesno:"✅ Configured,❌ Missing" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">Google Client Secret:</span>
+                        <span class="font-mono text-slate-900 dark:text-slate-100">{{ google_client_secret_configured|yesno:"✅ Configured,❌ Missing" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">Base URL:</span>
+                        <span class="font-mono text-slate-900 dark:text-slate-100">{{ base_url }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">Callback URL:</span>
+                        <span class="font-mono text-slate-900 dark:text-slate-100">{{ callback_url }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-3">User Status</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">Authenticated:</span>
+                        <span class="font-mono text-slate-900 dark:text-slate-100">{{ user.is_authenticated|yesno:"✅ Yes,❌ No" }}</span>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">Username:</span>
+                        <span class="font-mono text-slate-900 dark:text-slate-100">{{ user.username }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600 dark:text-slate-400">Connected Accounts:</span>
+                        <span class="font-mono text-slate-900 dark:text-slate-100">{{ accounts_count }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Google Cloud Console Setup -->
+        <div class="mb-8">
+            <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-4">🔧 Google Cloud Console Setup Required</h3>
+            
+            <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg mb-4">
+                <div class="flex items-start space-x-3">
+                    <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.99-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    <div>
+                        <h4 class="font-semibold text-yellow-800 dark:text-yellow-300">OAuth App Name Issue</h4>
+                        <p class="text-sm text-yellow-700 dark:text-yellow-400 mt-1">
+                            The "Black Coral" name suggests this Google OAuth app was configured for a different project.
+                            You need to either create a new OAuth application or update the existing one.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                    <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">📋 Setup Steps</h4>
+                    <ol class="list-decimal list-inside text-sm text-blue-700 dark:text-blue-400 space-y-2 ml-4">
+                        <li>Go to <a href="https://console.cloud.google.com/apis/credentials" class="underline">Google Cloud Console Credentials</a></li>
+                        <li>Click "CREATE CREDENTIALS" → "OAuth 2.0 Client IDs"</li>
+                        <li>Set Application type to "Web application"</li>
+                        <li>Set Name to "FYXERAI Email Assistant" (or your preferred name)</li>
+                        <li>Add Authorized redirect URI: <code class="bg-blue-100 dark:bg-blue-800 px-1 rounded">{{ callback_url }}</code></li>
+                        <li>Copy the Client ID and Client Secret to your .env file</li>
+                        <li>Make sure Gmail API is enabled in your Google Cloud project</li>
+                    </ol>
+                </div>
+                
+                <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+                    <h4 class="font-semibold text-green-800 dark:text-green-300 mb-2">🔐 Required OAuth Scopes</h4>
+                    <ul class="list-disc list-inside text-sm text-green-700 dark:text-green-400 space-y-1 ml-4">
+                        <li>https://www.googleapis.com/auth/gmail.readonly</li>
+                        <li>https://www.googleapis.com/auth/gmail.modify</li>
+                        <li>https://www.googleapis.com/auth/gmail.compose</li>
+                        <li>https://www.googleapis.com/auth/userinfo.email</li>
+                        <li>https://www.googleapis.com/auth/userinfo.profile</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Actions -->
+        {% if user.is_authenticated and google_client_id_configured and google_client_secret_configured %}
+        <div class="mb-8">
+            <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-4">🧪 Test OAuth Flow</h3>
+            <div class="flex space-x-4">
+                <a href="{% url 'core:gmail_oauth_login' %}" 
+                   class="btn-primary">
+                    Test Gmail OAuth
+                </a>
+                <button onclick="clearOAuthState()" class="btn-outline">
+                    Clear OAuth State
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Connected Accounts -->
+        {% if user.is_authenticated %}
+        <div>
+            <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-4">📧 Connected Accounts</h3>
+            {% if accounts %}
+                <div class="space-y-3">
+                    {% for account in accounts %}
+                    <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-red-600 dark:text-red-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-slate-900 dark:text-slate-100">{{ account.email_address }}</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">{{ account.provider|title }} • {{ account.is_active|yesno:"Active,Inactive" }}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">
+                            Connected {{ account.created_at|timesince }} ago
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-slate-600 dark:text-slate-400">No accounts connected yet.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function clearOAuthState() {
+    fetch('/api/clear-oauth-state/', {method: 'POST'})
+        .then(() => alert('OAuth state cleared'))
+        .catch(() => alert('Error clearing OAuth state'));
+}
+</script>
+{% endblock %}

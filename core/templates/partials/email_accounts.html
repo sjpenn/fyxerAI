@@ -1,0 +1,220 @@
+<!-- Email Accounts Partial -->
+<div class="space-y-6">
+    {% if debug_mode %}
+        <!-- Debug Information -->
+        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+            <h4 class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">Debug Information</h4>
+            <div class="text-xs text-yellow-700 dark:text-yellow-300 space-y-1">
+                <p>User: {{ user.username }} (ID: {{ user.id }})</p>
+                <p>Total Accounts: {{ total_accounts }}</p>
+                <p>Active Accounts: {{ accounts|length }}</p>
+                <p>Timestamp: {% now "Y-m-d H:i:s" %}</p>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Quick Connect Section -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-700 p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Add Email Account</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">Connect your Gmail or Outlook account to get started</p>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'core:gmail_oauth_login' %}" 
+                   class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors">
+                    <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                    </svg>
+                    Connect Gmail
+                </a>
+                <a href="{% url 'core:add_account_form' %}" class="btn-outline">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    More Options
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connected Accounts List -->
+    <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+        <!-- Header -->
+        <div class="border-b border-slate-200 dark:border-slate-700 p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Connected Accounts</h2>
+                <a href="{% url 'core:add_account_form' %}" class="btn-primary">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add Account
+                </a>
+            </div>
+        </div>
+
+    <!-- Accounts List -->
+    <div class="divide-y divide-slate-200 dark:divide-slate-700">
+        {% if accounts %}
+            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3 mb-4">
+                <p class="text-sm text-green-800 dark:text-green-200">
+                    <strong>{{ accounts|length }}</strong> connected account{{ accounts|length|pluralize }} found
+                </p>
+            </div>
+            {% for account in accounts %}
+                <div class="p-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <!-- Provider Icon -->
+                            <div class="flex-shrink-0">
+                                {% if account.provider == 'gmail' %}
+                                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-red-600 dark:text-red-400" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                                        </svg>
+                                    </div>
+                                {% elif account.provider == 'outlook' %}
+                                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M7.88 12.04q0 .45-.11.87-.1.41-.33.74-.22.33-.58.52-.37.2-.87.2t-.87-.2q-.36-.19-.58-.52-.22-.33-.33-.74-.1-.42-.1-.87t.1-.87q.11-.41.33-.74.22-.33.58-.52.36-.19.87-.19t.87.19q.37.19.58.52.22.33.33.74.11.42.11.87zM21.5 9v10.5q0 .75-.56 1.31-.55.56-1.31.56H4.37q-.75 0-1.31-.56Q2.5 20.25 2.5 19.5V9q0-.75.56-1.31Q3.62 7.13 4.37 7.13h15.26q.75 0 1.31.56.56.56.56 1.31z"/>
+                                        </svg>
+                                    </div>
+                                {% else %}
+                                    <div class="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Account Info -->
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2">
+                                    <h3 class="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                        {{ account.display_name|default:account.email_address }}
+                                    </h3>
+                                    {% if account.is_active %}
+                                        <span class="badge badge-success">Active</span>
+                                    {% else %}
+                                        <span class="badge badge-error">Inactive</span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">
+                                    {{ account.email_address }}
+                                </p>
+                                <div class="flex items-center space-x-4 mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                    <span>{{ account.get_provider_display }}</span>
+                                    {% if account.last_sync %}
+                                        <span>Last sync: {{ account.last_sync|timesince }} ago</span>
+                                    {% else %}
+                                        <span>Never synced</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Actions -->
+                        <div class="flex items-center space-x-2">
+                            <!-- Sync Status -->
+                            {% if account.sync_enabled %}
+                                <div class="w-2 h-2 bg-green-500 rounded-full" title="Sync enabled"></div>
+                            {% else %}
+                                <div class="w-2 h-2 bg-red-500 rounded-full" title="Sync disabled"></div>
+                            {% endif %}
+                            
+                            <!-- Actions Dropdown -->
+                            <div x-data="AlpineComponents.dropdown()" class="relative">
+                                <button @click="toggle()" class="btn-sm btn-outline">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                    </svg>
+                                </button>
+                                
+                                <div x-show="open" 
+                                     @click.away="hide()"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                     class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 z-10">
+                                    <div class="py-1">
+                                        <button class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                                hx-post="/api/email-accounts/{{ account.id }}/sync/"
+                                                hx-target="#main-content">
+                                            Sync Now
+                                        </button>
+                                        <button class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                            Settings
+                                        </button>
+                                        <button class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                            {% if account.sync_enabled %}Disable Sync{% else %}Enable Sync{% endif %}
+                                        </button>
+                                        <hr class="my-1 border-slate-200 dark:border-slate-600">
+                                        <button class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                                hx-delete="/api/email-accounts/{{ account.id }}/"
+                                                hx-confirm="Are you sure you want to disconnect this account?"
+                                                hx-target="#main-content">
+                                            Disconnect
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Stats -->
+                    <div class="mt-4 grid grid-cols-3 gap-4">
+                        <div class="text-center">
+                            <p class="text-lg font-semibold text-slate-900 dark:text-slate-100">{{ account.total_count|default:0 }}</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Total Messages</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-lg font-semibold text-slate-900 dark:text-slate-100">{{ account.unread_count|default:0 }}</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Unread</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-lg font-semibold text-slate-900 dark:text-slate-100">{{ account.week_count|default:0 }}</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">This Week</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="p-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <h3 class="mt-4 text-sm font-medium text-slate-900 dark:text-slate-100">No connected accounts</h3>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                    Connect your Gmail or Outlook account to get started with email automation.
+                </p>
+                <div class="mt-6 space-y-3">
+                    <button class="btn-primary block w-full">
+                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                        </svg>
+                        Connect Gmail
+                    </button>
+                    <button class="btn-outline block w-full">
+                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7.88 12.04q0 .45-.11.87-.1.41-.33.74-.22.33-.58.52-.37.2-.87.2t-.87-.2q-.36-.19-.58-.52-.22-.33-.33-.74-.1-.42-.1-.87t.1-.87q.11-.41.33-.74.22-.33.58-.52.36-.19.87-.19t.87.19q.37.19.58.52.22.33.33.74.11.42.11.87zM21.5 9v10.5q0 .75-.56 1.31-.55.56-1.31.56H4.37q-.75 0-1.31-.56Q2.5 20.25 2.5 19.5V9q0-.75.56-1.31Q3.62 7.13 4.37 7.13h15.26q.75 0 1.31.56.56.56.56 1.31z"/>
+                        </svg>
+                        Connect Outlook
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+</div>

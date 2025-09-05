@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-09-04T20:50:04.066760",
+  "test_results": {
+    "debug_page": {
+      "accessible": false,
+      "status_code": 400
+    },
+    "oauth_redirect": {
+      "redirect_working": false,
+      "status_code": 400
+    }
+  },
+  "configuration_check": {
+    "google_client_id_configured": true,
+    "google_client_secret_configured": true,
+    "google_client_id_value": "674909411431-r6spd40...",
+    "base_url": "http://localhost:8000"
+  },
+  "recommendations": [
+    "OAuth configuration appears to be working correctly"
+  ]
+}

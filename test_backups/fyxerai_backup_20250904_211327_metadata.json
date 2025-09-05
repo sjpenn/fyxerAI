@@ -1,0 +1,19 @@
+{
+  "backup_name": "fyxerai_backup_20250904_211327",
+  "timestamp": "2025-09-04T21:13:27.045407+00:00",
+  "database_engine": "django.db.backends.sqlite3",
+  "django_version": "unknown",
+  "backup_file": null,
+  "statistics": {
+    "users": 4,
+    "email_accounts": 4,
+    "email_messages": 100
+  },
+  "settings": {
+    "debug": true,
+    "allowed_hosts": [
+      "localhost",
+      "127.0.0.1"
+    ]
+  }
+}

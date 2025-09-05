@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Add Email Account - FYXERAI{% endblock %}
+
+{% block page_title %}Add Email Account{% endblock %}
+{% block page_subtitle %}Connect your Gmail or Outlook account to get started{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-6 mb-6">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                Connect Your Email Account
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400">
+                Choose an email provider to connect. You can add multiple accounts from the same or different providers.
+            </p>
+        </div>
+    </div>
+
+    <!-- Provider Options -->
+    <div class="space-y-4">
+        {% if google_client_id_configured %}
+        <!-- Gmail Option -->
+        <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600 dark:text-red-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                            Connect Gmail
+                        </h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                            Connect your Google Gmail account for email management and AI-powered features.
+                        </p>
+                        <div class="mt-3 text-xs text-slate-500 dark:text-slate-500">
+                            <strong>Permissions:</strong> Read emails, send emails, manage labels
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <a href="{% url 'core:gmail_oauth_login' %}" 
+                           class="btn-primary">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Connect Gmail
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Gmail Not Configured -->
+        <div class="bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6 opacity-50">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-.904.732-1.636 1.636-1.636h3.819l6.545 4.91 6.545-4.91h3.819c.904 0 1.636.732 1.636 1.636z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-slate-500 dark:text-slate-400">
+                        Gmail (Not Available)
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        Gmail integration requires OAuth credentials to be configured.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if microsoft_client_id_configured %}
+        <!-- Outlook Option -->
+        <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+            <div class="p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7.88 12.04q0 .45-.11.87-.1.41-.33.74-.22.33-.58.52-.37.2-.87.2t-.87-.2q-.36-.19-.58-.52-.22-.33-.33-.74-.1-.42-.1-.87t.1-.87q.11-.41.33-.74.22-.33.58-.52.36-.19.87-.19t.87.19q.37.19.58.52.22.33.33.74.11.42.11.87zM21.5 9v10.5q0 .75-.56 1.31-.55.56-1.31.56H4.37q-.75 0-1.31-.56Q2.5 20.25 2.5 19.5V9q0-.75.56-1.31Q3.62 7.13 4.37 7.13h15.26q.75 0 1.31.56.56.56.56 1.31z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                            Connect Outlook
+                        </h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                            Connect your Microsoft Outlook account for email management and AI-powered features.
+                        </p>
+                        <div class="mt-3 text-xs text-slate-500 dark:text-slate-500">
+                            <strong>Permissions:</strong> Read emails, send emails, manage folders
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <button class="btn-outline" disabled>
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Coming Soon
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Outlook Not Configured -->
+        <div class="bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6 opacity-50">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7.88 12.04q0 .45-.11.87-.1.41-.33.74-.22.33-.58.52-.37.2-.87.2t-.87-.2q-.36-.19-.58-.52-.22-.33-.33-.74-.1-.42-.1-.87t.1-.87q.11-.41.33-.74.22-.33.58-.52.36-.19.87-.19t.87.19q.37.19.58.52.22.33.33.74.11.42.11.87zM21.5 9v10.5q0 .75-.56 1.31-.55.56-1.31.56H4.37q-.75 0-1.31-.56Q2.5 20.25 2.5 19.5V9q0-.75.56-1.31Q3.62 7.13 4.37 7.13h15.26q.75 0 1.31.56.56.56.56 1.31z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-slate-500 dark:text-slate-400">
+                        Outlook (Not Available)
+                    </h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        Outlook integration requires OAuth credentials to be configured.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Security Note -->
+    <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700 p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-semibold text-blue-800 dark:text-blue-300">
+                    Your Privacy & Security
+                </h3>
+                <div class="mt-1 text-sm text-blue-700 dark:text-blue-400">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>All authentication is handled by secure OAuth2 protocols</li>
+                        <li>Your login credentials are never stored on our servers</li>
+                        <li>Access tokens are encrypted and stored securely</li>
+                        <li>You can disconnect any account at any time</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="mt-6 text-center">
+        <a href="{% url 'core:home' %}" 
+           class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 text-sm">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

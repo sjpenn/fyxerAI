@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FYXERAI Extension Test</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>FYXERAI Extension Test Page</h1>
+    <p>This page simulates Gmail for testing the extension.</p>
+    
+    <!-- Simulate Gmail interface elements -->
+    <div role="main" id="main">
+        <div class="nH">
+            <div data-thread-id="test-1">
+                <span>Test Email 1 - Important meeting tomorrow</span>
+                <span>sender@company.com</span>
+            </div>
+            <div data-thread-id="test-2">
+                <span>Test Email 2 - Newsletter update</span>
+                <span>newsletter@site.com</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate Gmail hostname for testing
+        console.log('Test page loaded - simulating Gmail interface');
+        
+        // Check if extension content script is loaded
+        setTimeout(() => {
+            const panel = document.getElementById('fyxerai-panel');
+            if (panel) {
+                console.log('✅ FYXERAI extension loaded successfully');
+                panel.style.display = 'block';
+            } else {
+                console.log('❌ FYXERAI extension not detected');
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

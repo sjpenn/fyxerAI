@@ -1,0 +1,68 @@
+{
+  "name": "fyxerai-geds",
+  "version": "1.0.0",
+  "description": "FYXERAI Gmail Email Drafting System - AI-powered email management",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "build-css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "build-css-prod": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify",
+    "build-css-once": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css",
+    "dev": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:accessibility": "playwright test tests/e2e/accessibility.spec.js",
+    "test:performance": "playwright test tests/e2e/performance.spec.js",
+    "test:extension": "playwright test tests/e2e/chrome-extension.spec.js --headed",
+    "test:all": "npm run test:run && npm run test:e2e",
+    "test:watch": "vitest",
+    "playwright:install": "playwright install",
+    "playwright:install-deps": "playwright install-deps"
+  },
+  "keywords": [
+    "email",
+    "ai",
+    "gmail",
+    "outlook",
+    "automation",
+    "django",
+    "htmx",
+    "alpine",
+    "websockets",
+    "real-time"
+  ],
+  "author": "FYXERAI Team",
+  "license": "MIT",
+  "dependencies": {
+    "@shadcn/ui": "^0.0.4",
+    "alpinejs": "^3.14.9",
+    "autoprefixer": "^10.4.21",
+    "htmx.org": "^2.0.3",
+    "lucide-react": "^0.536.0",
+    "postcss": "^8.5.6",
+    "puppeteer": "^24.17.0",
+    "tailwindcss": "^3.4.17"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.8.3",
+    "@playwright/test": "^1.41.0",
+    "@testing-library/dom": "^9.3.4",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@vitest/coverage-v8": "^1.2.0",
+    "@vitest/ui": "^1.2.0",
+    "jsdom": "^23.2.0",
+    "vitest": "^1.2.0",
+    "ws": "^8.16.0"
+  }
+}

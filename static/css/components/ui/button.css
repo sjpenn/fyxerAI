@@ -1,0 +1,167 @@
+/* ShadCN UI Button Component - Adapted for Alpine.js */
+
+.btn {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  @apply disabled:pointer-events-none disabled:opacity-50;
+}
+
+/* Button Variants */
+.btn-primary {
+  @apply bg-primary-600 text-white hover:bg-primary-700;
+  @apply dark:bg-primary-500 dark:hover:bg-primary-600;
+}
+
+.btn-secondary {
+  @apply bg-secondary-100 text-secondary-900 hover:bg-secondary-200;
+  @apply dark:bg-secondary-800 dark:text-secondary-100 dark:hover:bg-secondary-700;
+}
+
+.btn-outline {
+  @apply border border-slate-200 bg-white hover:bg-slate-50 hover:text-slate-900;
+  @apply dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50;
+}
+
+.btn-ghost {
+  @apply hover:bg-slate-100 hover:text-slate-900;
+  @apply dark:hover:bg-slate-800 dark:hover:text-slate-50;
+}
+
+.btn-destructive {
+  @apply bg-red-600 text-white hover:bg-red-700;
+  @apply dark:bg-red-500 dark:hover:bg-red-600;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700;
+  @apply dark:bg-green-500 dark:hover:bg-green-600;
+}
+
+.btn-warning {
+  @apply bg-yellow-600 text-white hover:bg-yellow-700;
+  @apply dark:bg-yellow-500 dark:hover:bg-yellow-600;
+}
+
+/* Button Sizes */
+.btn-xs {
+  @apply h-7 px-2 text-xs;
+}
+
+.btn-sm {
+  @apply h-8 px-3 text-sm;
+}
+
+.btn-md {
+  @apply h-9 px-4 py-2;
+}
+
+.btn-lg {
+  @apply h-10 px-6 text-base;
+}
+
+.btn-xl {
+  @apply h-12 px-8 text-lg;
+}
+
+/* Button States */
+.btn-loading {
+  @apply relative text-transparent pointer-events-none;
+}
+
+.btn-loading::after {
+  @apply absolute inset-0 flex items-center justify-center;
+  content: '';
+  background-image: url("data:image/svg+xml,%3csvg width='16' height='16' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83' stroke='currentColor' stroke-width='2' stroke-linecap='round'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: spin 1s linear infinite;
+}
+
+.btn-disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+/* Icon Button */
+.btn-icon {
+  @apply w-9 h-9 p-0;
+}
+
+.btn-icon.btn-sm {
+  @apply w-8 h-8;
+}
+
+.btn-icon.btn-lg {
+  @apply w-10 h-10;
+}
+
+/* Button Group */
+.btn-group {
+  @apply inline-flex rounded-md shadow-sm;
+}
+
+.btn-group .btn {
+  @apply rounded-none focus:relative focus:z-10;
+}
+
+.btn-group .btn:first-child {
+  @apply rounded-l-md;
+}
+
+.btn-group .btn:last-child {
+  @apply rounded-r-md;
+}
+
+.btn-group .btn:not(:first-child) {
+  @apply -ml-px;
+}
+
+/* Focus and Active States */
+.btn:focus-visible {
+  @apply ring-2 ring-primary-500 ring-offset-2;
+  @apply dark:ring-primary-400 dark:ring-offset-slate-950;
+}
+
+.btn:active {
+  @apply scale-[0.98] transition-transform duration-75;
+}
+
+/* Hover Effects */
+.btn:hover:not(:disabled):not(.btn-disabled) {
+  @apply shadow-md transform translate-y-[-1px] transition-all duration-150;
+}
+
+/* Responsive Button */
+@media (max-width: 640px) {
+  .btn-responsive {
+    @apply w-full justify-center;
+  }
+}
+
+/* Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Button with Icon */
+.btn .btn-icon-left {
+  @apply mr-2 -ml-1;
+}
+
+.btn .btn-icon-right {
+  @apply ml-2 -mr-1;
+}
+
+/* Loading Animation Keyframes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

@@ -1,0 +1,278 @@
+/* ShadCN UI Card Component - Adapted for Alpine.js */
+
+.card {
+  @apply rounded-lg border bg-white shadow-sm;
+  @apply dark:bg-slate-900 dark:border-slate-800;
+}
+
+.card-elevated {
+  @apply shadow-md hover:shadow-lg transition-shadow duration-200;
+}
+
+.card-interactive {
+  @apply cursor-pointer hover:shadow-md transition-all duration-200;
+  @apply hover:scale-[1.02] hover:-translate-y-1;
+}
+
+/* Card Header */
+.card-header {
+  @apply flex flex-col space-y-1.5 p-6 pb-4;
+}
+
+.card-header-row {
+  @apply flex items-center justify-between p-6 pb-4;
+}
+
+.card-title {
+  @apply text-2xl font-semibold leading-none tracking-tight;
+  @apply text-slate-900 dark:text-slate-100;
+}
+
+.card-title-sm {
+  @apply text-lg font-semibold;
+}
+
+.card-title-lg {
+  @apply text-3xl font-bold;
+}
+
+.card-subtitle {
+  @apply text-sm text-slate-500 dark:text-slate-400;
+}
+
+.card-description {
+  @apply text-sm text-slate-600 dark:text-slate-400 leading-relaxed;
+}
+
+/* Card Content */
+.card-content {
+  @apply p-6 pt-0;
+}
+
+.card-content-full {
+  @apply p-6;
+}
+
+.card-body {
+  @apply p-6;
+}
+
+/* Card Footer */
+.card-footer {
+  @apply flex items-center p-6 pt-0;
+}
+
+.card-footer-between {
+  @apply flex items-center justify-between p-6 pt-0;
+}
+
+.card-footer-center {
+  @apply flex items-center justify-center p-6 pt-0;
+}
+
+.card-footer-end {
+  @apply flex items-center justify-end p-6 pt-0;
+}
+
+/* Card Variants */
+.card-bordered {
+  @apply border-2 border-slate-200 dark:border-slate-700;
+}
+
+.card-outline {
+  @apply border-2 border-primary-200 dark:border-primary-800;
+}
+
+.card-success {
+  @apply border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950;
+}
+
+.card-warning {
+  @apply border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950;
+}
+
+.card-error {
+  @apply border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950;
+}
+
+.card-info {
+  @apply border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950;
+}
+
+/* Card Sizes */
+.card-sm {
+  @apply max-w-sm;
+}
+
+.card-sm .card-header,
+.card-sm .card-content,
+.card-sm .card-footer {
+  @apply p-4;
+}
+
+.card-sm .card-content {
+  @apply pt-0;
+}
+
+.card-sm .card-footer {
+  @apply pt-0;
+}
+
+.card-md {
+  @apply max-w-md;
+}
+
+.card-lg {
+  @apply max-w-lg;
+}
+
+.card-xl {
+  @apply max-w-xl;
+}
+
+.card-2xl {
+  @apply max-w-2xl;
+}
+
+.card-full {
+  @apply w-full;
+}
+
+/* Card States */
+.card-loading {
+  @apply relative overflow-hidden;
+}
+
+.card-loading::before {
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent;
+  content: '';
+  animation: shimmer 2s infinite;
+}
+
+.card-disabled {
+  @apply opacity-50 pointer-events-none;
+}
+
+.card-selected {
+  @apply ring-2 ring-primary-500 ring-offset-2;
+  @apply dark:ring-primary-400 dark:ring-offset-slate-950;
+}
+
+/* Card Images */
+.card-image {
+  @apply w-full h-48 object-cover rounded-t-lg;
+}
+
+.card-image-sm {
+  @apply h-32;
+}
+
+.card-image-lg {
+  @apply h-64;
+}
+
+.card-avatar {
+  @apply w-12 h-12 rounded-full object-cover;
+}
+
+/* Card Animations */
+.card-fade-in {
+  @apply animate-fade-in;
+}
+
+.card-slide-up {
+  @apply animate-slide-up;
+}
+
+/* Card Grid */
+.card-grid {
+  @apply grid gap-6;
+}
+
+.card-grid-1 {
+  @apply grid-cols-1;
+}
+
+.card-grid-2 {
+  @apply grid-cols-1 md:grid-cols-2;
+}
+
+.card-grid-3 {
+  @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+}
+
+.card-grid-4 {
+  @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-4;
+}
+
+/* Card Stack */
+.card-stack {
+  @apply space-y-4;
+}
+
+/* Card Hover Effects */
+.card-hover-lift:hover {
+  @apply transform -translate-y-1 shadow-lg transition-all duration-200;
+}
+
+.card-hover-glow:hover {
+  @apply shadow-xl shadow-primary-500/25 transition-shadow duration-300;
+}
+
+.card-hover-scale:hover {
+  @apply transform scale-[1.02] transition-transform duration-200;
+}
+
+/* Card Collapse/Expand */
+.card-collapsible .card-content {
+  @apply overflow-hidden transition-all duration-300;
+}
+
+.card-collapsed .card-content {
+  @apply max-h-0 p-0;
+}
+
+.card-expanded .card-content {
+  @apply max-h-96 p-6 pt-0;
+}
+
+/* Card with Icon */
+.card-icon {
+  @apply flex items-start space-x-4;
+}
+
+.card-icon .card-icon-wrapper {
+  @apply flex-shrink-0 w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center;
+  @apply dark:bg-primary-900;
+}
+
+.card-icon .card-icon-wrapper svg {
+  @apply w-5 h-5 text-primary-600 dark:text-primary-400;
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Card Responsive */
+@media (max-width: 640px) {
+  .card-responsive .card-header,
+  .card-responsive .card-content,
+  .card-responsive .card-footer {
+    @apply p-4;
+  }
+  
+  .card-responsive .card-content {
+    @apply pt-0;
+  }
+  
+  .card-responsive .card-footer {
+    @apply pt-0;
+  }
+}

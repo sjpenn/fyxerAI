@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FYXERAI Email Assistant</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f8fafc;
+        }
+        
+        .fyxerai-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .fyxerai-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .fyxerai-content {
+            padding: 16px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-connected { background: #10b981; }
+        .status-disconnected { background: #ef4444; }
+        .status-loading { background: #f59e0b; }
+        
+        .category-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin: 2px;
+        }
+        
+        .category-urgent { background: #fee2e2; color: #dc2626; }
+        .category-important { background: #fef3c7; color: #d97706; }
+        .category-routine { background: #dbeafe; color: #2563eb; }
+        .category-spam { background: #f3f4f6; color: #6b7280; }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .email-preview {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        
+        .email-subject {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .email-sender {
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="fyxerai-panel" x-data="fyxeraiApp()" x-init="init()">
+        <!-- Header -->
+        <div class="fyxerai-header">
+            <h2 class="text-lg font-bold">FYXERAI</h2>
+            <p class="text-sm opacity-90">AI Email Assistant</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="fyxerai-content">
+            <!-- Connection Status -->
+            <div class="status-indicator">
+                <div class="status-dot" :class="{
+                    'status-connected': connectionStatus === 'connected',
+                    'status-disconnected': connectionStatus === 'disconnected',
+                    'status-loading': connectionStatus === 'connecting'
+                }"></div>
+                <span x-text="connectionText"></span>
+            </div>
+            
+            <!-- Current Email Info -->
+            <div x-show="currentEmail.subject" class="email-preview">
+                <div class="email-subject" x-text="currentEmail.subject"></div>
+                <div class="email-sender" x-text="currentEmail.sender"></div>
+                <div x-show="currentEmail.category">
+                    <span class="category-badge" 
+                          :class="'category-' + currentEmail.category"
+                          x-text="currentEmail.category"></span>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="space-y-2">
+                <button class="btn btn-primary" 
+                        @click="triageCurrentEmail()" 
+                        :disabled="loading || connectionStatus !== 'connected'">
+                    <span x-show="!triageLoading">🎯 Triage Email</span>
+                    <span x-show="triageLoading" class="loading"></span>
+                </button>
+                
+                <button class="btn btn-secondary" 
+                        @click="generateDraft()" 
+                        :disabled="loading || connectionStatus !== 'connected'">
+                    <span x-show="!draftLoading">✨ Generate AI Draft</span>
+                    <span x-show="draftLoading" class="loading"></span>
+                </button>
+                
+                <button class="btn btn-secondary" 
+                        @click="refreshConnection()" 
+                        :disabled="loading">
+                    <span x-show="!refreshLoading">🔄 Refresh Connection</span>
+                    <span x-show="refreshLoading" class="loading"></span>
+                </button>
+            </div>
+            
+            <!-- Statistics -->
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <div class="text-sm text-gray-600 text-center">
+                    <div>Emails Triaged: <span class="font-semibold" x-text="stats.emailsTriaged"></span></div>
+                    <div>Drafts Generated: <span class="font-semibold" x-text="stats.draftsGenerated"></span></div>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div x-show="message" class="mt-4 p-3 rounded" 
+                 :class="{
+                     'bg-green-100 text-green-800': messageType === 'success',
+                     'bg-red-100 text-red-800': messageType === 'error',
+                     'bg-blue-100 text-blue-800': messageType === 'info'
+                 }">
+                <div class="text-sm font-medium" x-text="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8002';
+        const API_ENDPOINTS = {
+            emails: '/api/emails/',
+            triage: '/api/emails/triage/',
+            reply: '/api/emails/reply/'
+        };
+
+        function fyxeraiApp() {
+            return {
+                // State
+                connectionStatus: 'connecting',
+                currentEmail: {},
+                loading: false,
+                triageLoading: false,
+                draftLoading: false,
+                refreshLoading: false,
+                message: '',
+                messageType: 'info',
+                stats: {
+                    emailsTriaged: 0,
+                    draftsGenerated: 0
+                },
+
+                // Computed
+                get connectionText() {
+                    switch (this.connectionStatus) {
+                        case 'connected': return 'Connected to FYXERAI';
+                        case 'disconnected': return 'Disconnected';
+                        case 'connecting': return 'Connecting...';
+                        default: return 'Unknown Status';
+                    }
+                },
+
+                // Methods
+                async init() {
+                    console.log('FYXERAI Taskpane: Initializing...');
+                    
+                    // Initialize Office.js
+                    Office.onReady((info) => {
+                        console.log('Office.js ready, host:', info.host);
+                        this.loadCurrentEmail();
+                        this.checkConnection();
+                    });
+                },
+
+                async loadCurrentEmail() {
+                    try {
+                        if (Office.context.mailbox && Office.context.mailbox.item) {
+                            const item = Office.context.mailbox.item;
+                            
+                            this.currentEmail = {
+                                subject: item.subject || 'No Subject',
+                                sender: item.from ? item.from.displayName : 'Unknown Sender',
+                                category: 'pending'
+                            };
+                            
+                            console.log('Current email loaded:', this.currentEmail);
+                        }
+                    } catch (error) {
+                        console.error('Failed to load current email:', error);
+                        this.showMessage('Failed to load email information', 'error');
+                    }
+                },
+
+                async checkConnection() {
+                    try {
+                        this.connectionStatus = 'connecting';
+                        
+                        const response = await fetch(`${API_BASE}${API_ENDPOINTS.emails}`, {
+                            method: 'HEAD',
+                            headers: {
+                                'X-Outlook-Addin': 'fyxerai-v1.0'
+                            }
+                        });
+
+                        this.connectionStatus = response.ok ? 'connected' : 'disconnected';
+                        
+                        if (this.connectionStatus === 'connected') {
+                            this.showMessage('Successfully connected to FYXERAI backend', 'success');
+                        } else {
+                            this.showMessage('Failed to connect to FYXERAI backend', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Connection check failed:', error);
+                        this.connectionStatus = 'disconnected';
+                        this.showMessage('Connection failed: ' + error.message, 'error');
+                    }
+                },
+
+                async triageCurrentEmail() {
+                    if (!Office.context.mailbox.item) {
+                        this.showMessage('No email selected', 'error');
+                        return;
+                    }
+
+                    this.triageLoading = true;
+                    this.message = '';
+
+                    try {
+                        const item = Office.context.mailbox.item;
+                        
+                        // Extract email content
+                        const emailData = {
+                            subject: item.subject,
+                            sender: item.from ? item.from.emailAddress : '',
+                            id: item.internetMessageId || Date.now().toString()
+                        };
+
+                        const response = await fetch(`${API_BASE}${API_ENDPOINTS.triage}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Outlook-Addin': 'fyxerai-v1.0'
+                            },
+                            body: JSON.stringify({
+                                platform: 'outlook',
+                                email: emailData,
+                                action: 'triage_single'
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+                        
+                        // Update current email category
+                        this.currentEmail.category = result.category || 'routine';
+                        this.stats.emailsTriaged++;
+                        
+                        this.showMessage(`Email categorized as: ${this.currentEmail.category}`, 'success');
+                        
+                        console.log('Triage result:', result);
+
+                    } catch (error) {
+                        console.error('Triage failed:', error);
+                        this.showMessage('Triage failed: ' + error.message, 'error');
+                    } finally {
+                        this.triageLoading = false;
+                    }
+                },
+
+                async generateDraft() {
+                    if (!Office.context.mailbox.item) {
+                        this.showMessage('No email selected', 'error');
+                        return;
+                    }
+
+                    this.draftLoading = true;
+                    this.message = '';
+
+                    try {
+                        const item = Office.context.mailbox.item;
+                        
+                        // Get email body for context
+                        item.body.getAsync(Office.CoercionType.Text, async (result) => {
+                            if (result.status === Office.AsyncResultStatus.Succeeded) {
+                                const emailContent = {
+                                    subject: item.subject,
+                                    sender: item.from ? item.from.emailAddress : '',
+                                    body: result.value.substring(0, 1000), // Limit body size
+                                    category: this.currentEmail.category || 'routine'
+                                };
+
+                                const response = await fetch(`${API_BASE}${API_ENDPOINTS.reply}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-Outlook-Addin': 'fyxerai-v1.0'
+                                    },
+                                    body: JSON.stringify({
+                                        platform: 'outlook',
+                                        email_content: emailContent,
+                                        action: 'generate_single_draft'
+                                    })
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+
+                                const result = await response.json();
+                                
+                                // Create new draft reply
+                                this.createDraftReply(result.draft);
+                                this.stats.draftsGenerated++;
+                                
+                                this.showMessage('AI draft generated successfully!', 'success');
+
+                            } else {
+                                throw new Error('Failed to read email body');
+                            }
+                            
+                            this.draftLoading = false;
+                        });
+
+                    } catch (error) {
+                        console.error('Draft generation failed:', error);
+                        this.showMessage('Draft generation failed: ' + error.message, 'error');
+                        this.draftLoading = false;
+                    }
+                },
+
+                createDraftReply(draftContent) {
+                    try {
+                        // Create a new email draft
+                        Office.context.mailbox.displayReplyForm({
+                            htmlBody: draftContent,
+                            attachments: []
+                        });
+                    } catch (error) {
+                        console.error('Failed to create draft:', error);
+                        this.showMessage('Failed to create draft email', 'error');
+                    }
+                },
+
+                async refreshConnection() {
+                    this.refreshLoading = true;
+                    await this.checkConnection();
+                    this.refreshLoading = false;
+                },
+
+                showMessage(msg, type = 'info') {
+                    this.message = msg;
+                    this.messageType = type;
+                    
+                    // Auto-clear success/info messages
+                    if (type === 'success' || type === 'info') {
+                        setTimeout(() => {
+                            this.message = '';
+                        }, 5000);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="require-trusted-types-for 'script'; trusted-types test-fyxerai">
+    <title>FYXERAI Extension Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 10px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>FYXERAI Extension CSP Fixes Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: CSP TrustedTypes Compliance</h2>
+        <div id="csp-test-result">Running test...</div>
+        <div id="test-container"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Mock Gmail Structure</h2>
+        <div class="mock-gmail">
+            <table>
+                <tr data-thread-id="thread-1">
+                    <td>
+                        <span class="bog">Test Email 1</span>
+                        <span class="yW">sender@test.com</span>
+                    </td>
+                </tr>
+                <tr data-thread-id="thread-2">
+                    <td>
+                        <span class="bog">Test Email 2</span>
+                        <span class="yW">sender2@test.com</span>
+                    </td>
+                </tr>
+                <tr data-thread-id="thread-1">
+                    <!-- Duplicate to test deduplication -->
+                    <td>
+                        <span class="bog">Test Email 1 (Duplicate)</span>
+                        <span class="yW">sender@test.com</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="gmail-test-result">Check console for Gmail selector test results</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Safe DOM Manipulation</h2>
+        <div id="dom-test-result">Running test...</div>
+        <div id="dom-test-target"></div>
+    </div>
+
+    <script src="validate-fixes.js"></script>
+    <script>
+        // Additional tests specific to this page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Test page loaded, running additional tests...');
+            
+            // Test CSP compliance visually
+            const cspResult = document.getElementById('csp-test-result');
+            const domResult = document.getElementById('dom-test-result');
+            
+            try {
+                // This should work with our fixes
+                const testDiv = document.getElementById('test-container');
+                while (testDiv.firstChild) {
+                    testDiv.removeChild(testDiv.firstChild);
+                }
+                
+                const span = document.createElement('span');
+                span.textContent = '✅ CSP compliant DOM manipulation successful';
+                span.className = 'success';
+                testDiv.appendChild(span);
+                
+                cspResult.textContent = '✅ CSP tests passed';
+                cspResult.className = 'success';
+            } catch (error) {
+                cspResult.textContent = '❌ CSP tests failed: ' + error.message;
+                cspResult.className = 'error';
+            }
+            
+            // Test our improved Gmail selector
+            try {
+                const gmailEmails = document.querySelectorAll('tr[data-thread-id]:not([data-fyxerai-processed])');
+                const processedThreadIds = new Set();
+                let duplicatesFound = 0;
+                
+                gmailEmails.forEach(element => {
+                    const threadId = element.getAttribute('data-thread-id');
+                    if (processedThreadIds.has(threadId)) {
+                        duplicatesFound++;
+                        console.log(`Found duplicate thread ID: ${threadId}`);
+                    } else {
+                        processedThreadIds.add(threadId);
+                        element.setAttribute('data-fyxerai-processed', 'true');
+                    }
+                });
+                
+                domResult.innerHTML = '';
+                const resultSpan = document.createElement('span');
+                resultSpan.textContent = `✅ Gmail selector test: Found ${processedThreadIds.size} unique threads, ${duplicatesFound} duplicates avoided`;
+                resultSpan.className = 'success';
+                domResult.appendChild(resultSpan);
+                
+            } catch (error) {
+                domResult.textContent = '❌ Gmail selector test failed: ' + error.message;
+                domResult.className = 'error';
+            }
+        });
+    </script>
+</body>
+</html>

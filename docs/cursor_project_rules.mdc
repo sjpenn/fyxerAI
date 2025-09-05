@@ -1,0 +1,145 @@
+---
+description: Apply these rules when creating the project
+globs:
+alwaysApply: true
+---
+## Project Overview
+
+*   **Type:** MVP FYXERAI replica
+*   **Description:** Manage and handle emails across multiple Gmail and Outlook accounts, replicating and improving on Fyxer AI’s core features.
+*   **Primary Goal:** Build an MVP FYXERAI replica for personal use to enable multi-account email triage, AI-powered draft replies, native integrations, unified dashboard, meeting management, and smart scheduling.
+
+## Project Structure
+
+### Framework-Specific Routing
+
+*   **Directory Rules:**
+
+    *   Django 4.2: Define URL patterns in `project/urls.py` and per-app `app/urls.py`; map views in `app/views.py`.
+    *   Example 1: `project/urls.py` → `path('api/', include('app.api_urls'))`.
+    *   Example 2: HTMX endpoints under `app/urls.py`, e.g., `path('email/triage/', views.triage_view)` returning HTML partials.
+    *   Example 3: Serve extension assets via Django staticfiles from `chrome_extension/`.
+
+### Core Directories
+
+*   **Versioned Structure:**
+
+    *   `project/`: Django settings, `urls.py`, WSGI/ASGI entrypoints (Django 4.2).
+    *   `app/`: Django app with `models.py`, `views.py`, `urls.py`, `templates/`, `static/`.
+    *   `templates/`: HTMX-enabled HTML templates using Alpine.js, Tailwind CSS, ShadCN UI.
+    *   `static/`: Compiled Tailwind assets, Alpine.js scripts, ShadCN UI components.
+    *   `chrome_extension/`: Manifest v3, content scripts, service worker.
+    *   `edge_extension/`: Edge extension code mirroring Chrome (v3).
+    *   `outlook_addin/`: OfficeJS task pane add-in files (`manifest.xml`, HTML, JS).
+
+### Key Files
+
+*   **Stack-Versioned Patterns:**
+
+    *   `project/settings.py`: Django 4.2 settings configured via `django-environ`.
+    *   `app/views.py`: Class-based and function-based views returning HTMX partials.
+    *   `templates/base.html`: Base layout injecting Tailwind CSS (JIT), Alpine.js@3, ShadCN UI.
+    *   `tailwind.config.js`: Tailwind CSS@3 JIT and purge config.
+    *   `chrome_extension/manifest.json`: Manifest v3 for Chrome extension.
+    *   `outlook_addin/manifest.xml`: OfficeJS add-in manifest v1.1.
+
+## Tech Stack Rules
+
+*   **Version Enforcement:**
+
+    *   django@4.2: Use `path()` routing, `django-environ`, ASGI support; no deprecated `url()` patterns.
+    *   htmx@1.7: All dynamic UI interactions via `hx-get`/`hx-post`; no full page reloads.
+    *   alpine.js@3: Declarative `x-data`, `x-show`, `x-on`; avoid external bundlers.
+    *   tailwindcss@3: Enable JIT mode; purge `templates/**/*.html`, `app/**/*.html`.
+    *   shadcn-ui@latest: Use component library within Tailwind context.
+    *   Chrome Extension manifest v3: Use service worker, no persistent background pages.
+    *   officejs@1.1: Task pane add-in patterns only; no deprecated APIs.
+
+## PRD Compliance
+
+*   **Non-Negotiable:**
+
+    *   "Multi-Account Support: Must handle multiple Gmail and Outlook accounts.": Ensure user and account models support N:N relationships and OAuth flows.
+    *   "Generate AI-powered draft replies for emails needing a response, saving drafts for review and editing *before* sending.": Do not auto-send; store drafts and expose via dashboard and extension.
+    *   "Meeting Bot: Join calls, transcribe audio, summarize content, draft follow-ups.": Integrate Zoom/Google Meet/Microsoft Teams APIs, store media in AWS S3, transcribe via OpenAI.
+
+## App Flow Integration
+
+*   **Stack-Aligned Flow:**
+
+    *   Email Triage Flow → Django view at `/api/email/triage/` returns HTMX partial injected into `#inbox-panel`.
+    *   AI Draft Flow → POST to `/api/email/draft/` calls OpenAI API; returns draft via extension modal using `chrome.runtime.sendMessage`.
+    *   Meeting Bot Flow → Webhook endpoint `/webhooks/zoom/` triggers Celery task, stores audio in S3, transcribes, then serves summary at `/api/meeting/summary/`.
+    *   OAuth Flow → Routes at `/accounts/oauth/google/`, `/accounts/oauth/microsoft/`; handle callbacks securely with `state` validation.
+
+## Best Practices
+
+*   Django:
+    *   Use `django-environ` for environment variables.
+    *   Enforce `SECURE_SSL_REDIRECT`, `CSRF_COOKIE_SECURE`, `SESSION_COOKIE_SECURE`.
+    *   Use migrations in CI and review with `makemigrations` checks.
+*   HTMX:
+    *   Leverage `hx-boost` for progressive enhancement.
+    *   Return HTML snippets for partial swaps using `hx-target` and `hx-swap`.
+    *   Validate server responses to ensure proper swapping.
+*   Alpine.js:
+    *   Keep `x-data` state minimal.
+    *   Use event modifiers (e.g., `.debounce`).
+    *   Factor reusable UI snippets into template includes.
+*   Tailwind CSS:
+    *   Enable JIT mode; configure purge paths correctly.
+    *   Use `@apply` for custom components.
+    *   Maintain consistent utility class organization.
+*   ShadCN UI:
+    *   Utilize built-in variants and follow accessibility defaults.
+    *   Override styles via Tailwind config, not inline CSS.
+*   Browser Extensions:
+    *   Manifest v3 only; secure `content_security_policy`.
+    *   Use message namespaces to avoid conflicts.
+    *   Keep background service worker logic minimal.
+*   Outlook Add-in:
+    *   Implement OfficeJS task pane pattern for web and desktop.
+    *   Validate and refresh SSO tokens securely.
+*   OpenAI API:
+    *   Implement retry/backoff for rate limits.
+    *   Sanitize and validate inputs to avoid injection.
+    *   Cache frequent requests where possible.
+*   AWS S3 / django-storages:
+    *   Use IAM roles with least privilege.
+    *   Enforce bucket encryption and versioning.
+    *   Serve uploads via presigned URLs.
+*   OAuth (Google/Microsoft):
+    *   Validate `state` parameter in callback.
+    *   Encrypt and securely store refresh tokens.
+    *   Limit scopes to least privilege.
+
+## Rules
+
+*   Derive folder/file patterns **directly** from techStackDoc versions.
+*   For django@4.2: Enforce `app/urls.py` using `path()` and `include()`. No regex `url()`.
+*   For htmx@1.7: All dynamic interactions must use HTMX attributes; no full-page JS reloads.
+*   For alpine.js@3: Embed JS logic within HTML templates; no external bundling.
+*   For tailwindcss@3: JIT mode with purge paths; no global CSS overrides.
+*   For Chrome/Edge extensions: Manifest v3 only; no manifest v2.
+*   For Outlook Add-in: Use OfficeJS task pane patterns; no deprecated APIs.
+*   Do not mix paradigms (e.g., no React or Vue in Django templates).
+*   Separate browser extension code from web dashboard code.
+
+## Rules Metrics
+
+Before starting the project development, create a metrics file in the root of the project called `cursor_metrics.md`.
+
+### Instructions:
+
+*   Each time a cursor rule is used as context, update `cursor_metrics.md`.
+*   Use the following format for `cursor_metrics.md`:
+
+# Rules Metrics
+
+## Usage
+
+The number of times rules is used as context
+
+*   rule-name.mdc: 5
+*   another-rule.mdc: 2
+*   ...other rules

@@ -1,0 +1,255 @@
+<!-- ShadCN UI Button Component Template for Alpine.js -->
+
+<!-- Basic Button -->
+<button 
+    x-data="{ 
+        loading: false,
+        disabled: false,
+        variant: 'primary',
+        size: 'md'
+    }"
+    :class="{
+        'btn': true,
+        'btn-primary': variant === 'primary',
+        'btn-secondary': variant === 'secondary', 
+        'btn-outline': variant === 'outline',
+        'btn-ghost': variant === 'ghost',
+        'btn-destructive': variant === 'destructive',
+        'btn-success': variant === 'success',
+        'btn-warning': variant === 'warning',
+        'btn-xs': size === 'xs',
+        'btn-sm': size === 'sm',
+        'btn-md': size === 'md',
+        'btn-lg': size === 'lg',
+        'btn-xl': size === 'xl',
+        'btn-loading': loading,
+        'btn-disabled': disabled
+    }"
+    :disabled="disabled || loading"
+    :aria-disabled="disabled || loading"
+    role="button"
+    tabindex="0"
+    @keydown.enter.prevent="$event.target.click()"
+    @keydown.space.prevent="$event.target.click()">
+    
+    <!-- Loading State -->
+    <span x-show="loading" class="sr-only">Loading...</span>
+    
+    <!-- Button Content -->
+    <span x-show="!loading">
+        <slot>Button</slot>
+    </span>
+</button>
+
+<!-- Icon Button -->
+<template x-data x-ref="iconButton">
+    <button 
+        x-data="{ 
+            loading: false,
+            disabled: false,
+            variant: 'primary',
+            size: 'md'
+        }"
+        :class="{
+            'btn btn-icon': true,
+            'btn-primary': variant === 'primary',
+            'btn-secondary': variant === 'secondary', 
+            'btn-outline': variant === 'outline',
+            'btn-ghost': variant === 'ghost',
+            'btn-sm': size === 'sm',
+            'btn-md': size === 'md',
+            'btn-lg': size === 'lg',
+            'btn-loading': loading,
+            'btn-disabled': disabled
+        }"
+        :disabled="disabled || loading"
+        :aria-disabled="disabled || loading"
+        :aria-label="$refs.iconButton.dataset.label || 'Icon button'"
+        role="button"
+        tabindex="0"
+        @keydown.enter.prevent="$event.target.click()"
+        @keydown.space.prevent="$event.target.click()">
+        
+        <!-- Icon Content -->
+        <span x-show="!loading">
+            <slot>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+            </slot>
+        </span>
+    </button>
+</template>
+
+<!-- Button with Icon -->
+<template x-data x-ref="buttonWithIcon">
+    <button 
+        x-data="{ 
+            loading: false,
+            disabled: false,
+            variant: 'primary',
+            size: 'md',
+            iconPosition: 'left'
+        }"
+        :class="{
+            'btn': true,
+            'btn-primary': variant === 'primary',
+            'btn-secondary': variant === 'secondary', 
+            'btn-outline': variant === 'outline',
+            'btn-ghost': variant === 'ghost',
+            'btn-xs': size === 'xs',
+            'btn-sm': size === 'sm',
+            'btn-md': size === 'md',
+            'btn-lg': size === 'lg',
+            'btn-loading': loading,
+            'btn-disabled': disabled
+        }"
+        :disabled="disabled || loading"
+        :aria-disabled="disabled || loading"
+        role="button"
+        tabindex="0"
+        @keydown.enter.prevent="$event.target.click()"
+        @keydown.space.prevent="$event.target.click()">
+        
+        <!-- Loading State -->
+        <span x-show="loading" class="sr-only">Loading...</span>
+        
+        <!-- Button Content with Icon -->
+        <span x-show="!loading" class="flex items-center">
+            <!-- Left Icon -->
+            <span x-show="iconPosition === 'left'" class="btn-icon-left">
+                <slot name="icon-left">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                </slot>
+            </span>
+            
+            <!-- Text Content -->
+            <span>
+                <slot>Button Text</slot>
+            </span>
+            
+            <!-- Right Icon -->
+            <span x-show="iconPosition === 'right'" class="btn-icon-right">
+                <slot name="icon-right">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </slot>
+            </span>
+        </span>
+    </button>
+</template>
+
+<!-- Button Group -->
+<div x-data="{ selectedIndex: 0 }" class="btn-group" role="group" aria-label="Button group">
+    <button 
+        x-data="{ index: 0 }"
+        :class="{
+            'btn btn-outline': true,
+            'btn-primary': selectedIndex === index,
+            'btn-secondary': selectedIndex !== index
+        }"
+        :aria-pressed="selectedIndex === index"
+        @click="selectedIndex = index"
+        role="button"
+        tabindex="0">
+        Option 1
+    </button>
+    
+    <button 
+        x-data="{ index: 1 }"
+        :class="{
+            'btn btn-outline': true,
+            'btn-primary': selectedIndex === index,
+            'btn-secondary': selectedIndex !== index
+        }"
+        :aria-pressed="selectedIndex === index"
+        @click="selectedIndex = index"
+        role="button"
+        tabindex="0">
+        Option 2
+    </button>
+    
+    <button 
+        x-data="{ index: 2 }"
+        :class="{
+            'btn btn-outline': true,
+            'btn-primary': selectedIndex === index,
+            'btn-secondary': selectedIndex !== index
+        }"
+        :aria-pressed="selectedIndex === index"
+        @click="selectedIndex = index"
+        role="button"
+        tabindex="0">
+        Option 3
+    </button>
+</div>
+
+<!-- Dropdown Button -->
+<div x-data="AlpineComponents.dropdown()" class="relative inline-block">
+    <button 
+        @click="toggle()"
+        @keydown.escape="hide()"
+        @keydown.arrow-down.prevent="show(); $nextTick(() => $refs.menu.focus())"
+        :class="{
+            'btn btn-outline': true,
+            'btn-primary': open
+        }"
+        :aria-expanded="open"
+        aria-haspopup="true"
+        role="button"
+        tabindex="0">
+        
+        <span class="flex items-center">
+            Dropdown
+            <svg class="ml-2 w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </span>
+    </button>
+    
+    <!-- Dropdown Menu -->
+    <div 
+        x-show="open"
+        x-transition:enter="transition ease-out duration-100"
+        x-transition:enter-start="transform opacity-0 scale-95"
+        x-transition:enter-end="transform opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-75"
+        x-transition:leave-start="transform opacity-100 scale-100"
+        x-transition:leave-end="transform opacity-0 scale-95"
+        @click.away="hide()"
+        @keydown.escape="hide()"
+        x-ref="menu"
+        class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 z-50"
+        role="menu"
+        aria-orientation="vertical"
+        tabindex="-1">
+        
+        <div class="py-1">
+            <button 
+                @click="hide()"
+                class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                role="menuitem"
+                tabindex="0">
+                Option 1
+            </button>
+            <button 
+                @click="hide()"
+                class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                role="menuitem"
+                tabindex="0">
+                Option 2
+            </button>
+            <hr class="my-1 border-slate-200 dark:border-slate-700">
+            <button 
+                @click="hide()"
+                class="block w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                role="menuitem"
+                tabindex="0">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>

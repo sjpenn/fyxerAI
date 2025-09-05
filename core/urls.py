@@ -28,6 +28,8 @@ api_urlpatterns = [
     path('gmail/message/<str:message_id>/', views.gmail_message_detail, name='gmail-message-detail'),
     # Gmail list (metadata-first)
     path('gmail/messages/', views.gmail_message_list, name='gmail-message-list'),
+    # Gmail Pub/Sub webhook
+    path('gmail/webhook/', views.gmail_webhook, name='gmail-webhook'),
     
     # Cross-account categorization system
     path('categorization/stats/', views.CategoryStatsView.as_view(), name='category-stats'),

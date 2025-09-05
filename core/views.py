@@ -21,6 +21,7 @@ from .serializers import (CategoryUpdateSerializer, EmailAccountSerializer,
                           UserPreferenceSerializer, UserSerializer)
 from .services.openai_service import get_openai_service
 from .services.gmail_service import get_gmail_service
+from .services.account_sync import CrossAccountSyncManager
 
 logger = logging.getLogger(__name__)
 
@@ -364,6 +365,65 @@ def gmail_message_detail(request, message_id):
         return JsonResponse({'message': data})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+from django.views.decorators.csrf import csrf_exempt
+import base64
+import json
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def gmail_webhook(request):
+    """Cloud Pub/Sub push endpoint for Gmail history notifications.
+    Expects JSON with {'message': {'data': base64-encoded JSON}}.
+    """
+    try:
+        envelope = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        return JsonResponse({'status': 'invalid-json'}, status=400)
+
+    message = envelope.get('message', {})
+    attributes = message.get('attributes', {}) or {}
+    data_b64 = message.get('data')
+    email_address = attributes.get('emailAddress')
+    history_id = attributes.get('historyId')
+
+    if data_b64:
+        try:
+            decoded = base64.b64decode(data_b64).decode('utf-8')
+            # Data may be JSON or plain string
+            try:
+                payload = json.loads(decoded)
+                email_address = email_address or payload.get('emailAddress')
+                history_id = history_id or str(payload.get('historyId'))
+            except Exception:
+                # Fallback: not JSON; ignore
+                pass
+        except Exception:
+            pass
+
+    if not email_address or not history_id:
+        return JsonResponse({'status': 'ignored', 'reason': 'missing email/historyId'}, status=200)
+
+    # Find account and trigger incremental sync
+    from .models import EmailAccount
+    acct = EmailAccount.objects.filter(provider='gmail', email_address=email_address).first()
+    if not acct:
+        return JsonResponse({'status': 'ignored', 'reason': 'account not found'}, status=200)
+
+    # Ensure we store latest history id then sync
+    if not acct.gmail_history_id:
+        acct.gmail_history_id = str(history_id)
+        acct.save(update_fields=['gmail_history_id', 'updated_at'])
+
+    try:
+        manager = CrossAccountSyncManager(acct.user)
+        # Use private method to reuse existing logic
+        result = manager._sync_account(acct, force_full_sync=False)
+        return JsonResponse({'status': 'ok', 'result': result})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
 
 
 @login_required

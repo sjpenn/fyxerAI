@@ -243,6 +243,10 @@ AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY', default='')
 AWS_S3_BUCKET_NAME = env('AWS_S3_BUCKET_NAME', default='')
 AWS_REGION = env('AWS_REGION', default='us-east-1')
 
+# Gmail Pub/Sub Watch Configuration
+GMAIL_PUBSUB_TOPIC = env('GMAIL_PUBSUB_TOPIC', default='')  # e.g., projects/<project>/topics/<topic>
+GMAIL_PUBSUB_LABELS = env.list('GMAIL_PUBSUB_LABELS', default=['INBOX'])
+
 # Redis Configuration
 REDIS_URL = env('REDIS_URL', default='redis://localhost:6379/0')
 

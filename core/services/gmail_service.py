@@ -592,6 +592,51 @@ class GmailService:
         """Batch modify labels for multiple messages."""
         if not self.is_authenticated() or not message_ids:
             return False
+
+    def start_watch(self, topic_name: str, label_ids: Optional[List[str]] = None, label_filter_action: str = 'include') -> Optional[Dict]:
+        """Start Gmail Pub/Sub watch; saves historyId and expiration to the account."""
+        if not self.is_authenticated() or not topic_name:
+            return None
+        body = {
+            'topicName': topic_name,
+            'labelIds': label_ids or ['INBOX'],
+            'labelFilterAction': label_filter_action,
+        }
+        try:
+            req = self.service.users().watch(userId='me', body=body)
+            resp = self._execute_with_retry(req)
+            if not resp:
+                return None
+            history_id = str(resp.get('historyId', ''))
+            expiration_ms = resp.get('expiration')  # milliseconds since epoch
+            from ..models import EmailAccount
+            acct = EmailAccount.objects.filter(email_address=self.user_email, provider='gmail').first()
+            if acct:
+                if history_id:
+                    acct.gmail_history_id = history_id
+                if expiration_ms:
+                    try:
+                        from datetime import datetime, timezone as dt_tz
+                        acct.gmail_watch_expiration = datetime.fromtimestamp(int(expiration_ms) / 1000.0, tz=dt_tz.utc)
+                    except Exception:
+                        pass
+                acct.save(update_fields=['gmail_history_id', 'gmail_watch_expiration', 'updated_at'])
+            return {'historyId': history_id, 'expiration': expiration_ms}
+        except Exception as e:
+            logger.error(f"Failed to start Gmail watch: {e}")
+            return None
+
+    def stop_watch(self) -> bool:
+        """Stop Gmail Pub/Sub watch."""
+        if not self.is_authenticated():
+            return False
+        try:
+            req = self.service.users().stop(userId='me')
+            self._execute_with_retry(req)
+            return True
+        except Exception as e:
+            logger.error(f"Failed to stop Gmail watch: {e}")
+            return False
         body = {
             'ids': message_ids,
             'addLabelIds': add_label_ids or [],

@@ -56,6 +56,7 @@ class FakeUsersAPI:
     def __init__(self, pages, messages_data, send_capture):
         self._messages = FakeMessagesAPI(pages, messages_data, send_capture)
         self._drafts = FakeDraftsAPI()
+        self._watch_body = None
 
     def messages(self):
         return self._messages
@@ -65,6 +66,11 @@ class FakeUsersAPI:
 
     def getProfile(self, userId):
         return FakeRequest({'emailAddress': 'test@example.com', 'messagesTotal': 1, 'threadsTotal': 1, 'historyId': '100'})
+
+    def watch(self, userId, body):
+        self._watch_body = body
+        # expiration is ms since epoch
+        return FakeRequest({'historyId': '200', 'expiration': 32503680000000})
 
 
 class FakeService:
@@ -116,6 +122,29 @@ def test_fetch_history_since_collects_new_messages(monkeypatch):
     emails, latest = svc.fetch_history_since('100', max_results=10)
     assert len(emails) == 3
     assert latest == '102'
+
+
+@pytest.mark.django_db
+def test_start_watch_saves_history_and_exp(monkeypatch, django_user_model):
+    # Create a user and email account
+    user = django_user_model.objects.create_user(username='u1', email='test@example.com', password='x')
+    from core.models import EmailAccount
+    acct = EmailAccount.objects.create(
+        user=user, provider='gmail', email_address='test@example.com', display_name='T',
+        access_token='t', refresh_token='r', token_expires_at=timezone.now()
+    )
+    send_capture = {}
+    pages = {'': {}}
+    messages_data = {}
+    monkeypatch.setattr(GmailService, '_initialize_service', lambda self: None)
+    svc = GmailService('test@example.com')
+    svc.credentials = object()
+    svc.service = FakeService(pages, messages_data, send_capture)
+    out = svc.start_watch('projects/p/topics/t', ['INBOX'])
+    assert out['historyId'] == '200'
+    acct.refresh_from_db()
+    assert acct.gmail_history_id == '200'
+    assert acct.gmail_watch_expiration is not None
 
 
 @pytest.mark.django_db
